@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>China · May 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --hzh:#1a5c9a;--hzh-bg:#e8f1fa;--hzh-light:#f0f6fc;
+  --sha:#1a7a52;--sha-bg:#e6f4ed;--sha-light:#f0faf5;
+  --njg:#8a5a00;--njg-bg:#fdf0d5;--njg-light:#fffbf0;
+  --dep:#4a3580;--dep-bg:#f0edfb;--dep-light:#f8f6fe;
+  --text:#1a1a1a;--text2:#555;--text3:#888;
+  --border:#e5e5e5;--bg:#fafaf8;--white:#ffffff;
+  --sidebar:280px;
+}
+body{font-family:'DM Sans',system-ui,sans-serif;background:var(--bg);color:var(--text);display:flex;height:100vh;overflow:hidden;font-size:14px}
+
+/* SIDEBAR */
+#sidebar{width:var(--sidebar);min-width:var(--sidebar);background:var(--white);border-right:1px solid var(--border);overflow-y:auto;display:flex;flex-direction:column}
+#sidebar-header{padding:20px 20px 14px;border-bottom:1px solid var(--border);flex-shrink:0}
+#sidebar-header h1{font-family:'Playfair Display',Georgia,serif;font-size:19px;font-weight:400;color:var(--text);line-height:1.2;margin-bottom:4px}
+#sidebar-header p{font-size:11px;color:var(--text3);letter-spacing:.04em;text-transform:uppercase}
+.day-item{display:flex;align-items:stretch;cursor:pointer;border-bottom:1px solid var(--border);transition:background .12s;position:relative}
+.day-item:hover{background:#f5f5f3}
+.day-item.active{background:var(--white)}
+.day-item.active::after{content:'';position:absolute;right:0;top:0;bottom:0;width:3px;border-radius:2px 0 0 2px}
+.day-item.active.c-hzh::after{background:var(--hzh)}
+.day-item.active.c-sha::after{background:var(--sha)}
+.day-item.active.c-njg::after{background:var(--njg)}
+.day-item.active.c-dep::after{background:var(--dep)}
+.day-accent{width:4px;flex-shrink:0;border-radius:0}
+.c-hzh .day-accent{background:var(--hzh)}
+.c-sha .day-accent{background:var(--sha)}
+.c-njg .day-accent{background:var(--njg)}
+.c-dep .day-accent{background:var(--dep)}
+.day-inner{padding:11px 14px;flex:1;min-width:0}
+.day-meta{display:flex;align-items:center;gap:6px;margin-bottom:3px}
+.day-num{font-size:10px;font-weight:500;color:var(--text3);letter-spacing:.04em;text-transform:uppercase}
+.day-pill{font-size:10px;padding:1px 7px;border-radius:99px;font-weight:500;margin-left:auto;flex-shrink:0}
+.c-hzh .day-pill{background:var(--hzh-bg);color:var(--hzh)}
+.c-sha .day-pill{background:var(--sha-bg);color:var(--sha)}
+.c-njg .day-pill{background:var(--njg-bg);color:var(--njg)}
+.c-dep .day-pill{background:var(--dep-bg);color:var(--dep)}
+.day-title{font-size:13px;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.day-sub{font-size:11px;color:var(--text3);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* MAIN */
+#main{flex:1;overflow-y:auto;padding:36px 44px}
+#day-content{max-width:660px}
+.dc-eyebrow{font-size:11px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px}
+.c-hzh-t{color:var(--hzh)}.c-sha-t{color:var(--sha)}.c-njg-t{color:var(--njg)}.c-dep-t{color:var(--dep)}
+.dc-heading{font-family:'Playfair Display',Georgia,serif;font-size:28px;font-weight:400;line-height:1.2;color:var(--text);margin-bottom:4px}
+.dc-date{font-size:13px;color:var(--text3);margin-bottom:6px}
+.dc-summary{font-size:13px;color:var(--text2);margin-bottom:24px;line-height:1.6;padding-bottom:20px;border-bottom:1px solid var(--border)}
+.stat-row{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:24px}
+.stat{background:var(--white);border:1px solid var(--border);border-radius:8px;padding:10px 14px;min-width:120px}
+.stat-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:2px}
+.stat-val{font-size:13px;font-weight:500;color:var(--text)}
+
+/* TIMELINE */
+.timeline{position:relative;padding-left:32px}
+.timeline::before{content:'';position:absolute;left:10px;top:8px;bottom:8px;width:1px;background:var(--border)}
+.tl-item{position:relative;margin-bottom:22px}
+.tl-item:last-child{margin-bottom:0}
+.tl-icon{position:absolute;left:-28px;top:1px;width:20px;height:20px;border-radius:50%;border:1.5px solid var(--border);background:var(--white);display:flex;align-items:center;justify-content:center;font-size:10px}
+.tl-icon.transport{border-color:var(--hzh);background:var(--hzh-bg);color:var(--hzh)}
+.tl-icon.food{border-color:#c47a00;background:#fff8e6;color:#c47a00}
+.tl-icon.history{border-color:#a33;background:#fdf0f0;color:#a33}
+.tl-icon.night{border-color:var(--sha);background:var(--sha-bg);color:var(--sha)}
+.tl-icon.alert{border-color:#8a5a00;background:var(--njg-bg);color:#8a5a00}
+.tl-icon.rest{border-color:#888;background:#f5f5f5;color:#888}
+.tl-time{font-size:10px;color:var(--text3);font-weight:500;letter-spacing:.04em;text-transform:uppercase;margin-bottom:3px}
+.tl-title{font-size:14px;font-weight:500;color:var(--text);margin-bottom:4px}
+.tl-desc{font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:6px}
+.tags{display:flex;flex-wrap:wrap;gap:5px}
+.tag{font-size:11px;padding:2px 8px;border-radius:99px;border:1px solid var(--border);color:var(--text3);background:var(--white)}
+.tag.food{border-color:#e8c87a;background:#fffbf0;color:#8a5a00}
+.tag.transport{border-color:#b5d0ee;background:var(--hzh-light);color:var(--hzh)}
+.tag.warn{border-color:#f5c6c6;background:#fdf5f5;color:#a33}
+.tag.night{border-color:#b5ddc8;background:var(--sha-light);color:var(--sha)}
+
+/* FLIGHT CARD */
+.flight-card{background:var(--white);border:1px solid var(--border);border-radius:10px;padding:16px 18px;margin-bottom:22px}
+.fc-label{font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.05em;color:var(--text3);margin-bottom:10px}
+.fc-row{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:12px}
+.fc-iata{font-family:'Playfair Display',Georgia,serif;font-size:24px;font-weight:400}
+.fc-city{font-size:11px;color:var(--text3);margin-top:1px}
+.fc-time{font-size:14px;font-weight:500;margin-top:3px}
+.fc-terminal{font-size:10px;color:var(--text3);margin-top:1px}
+.fc-mid{text-align:center}
+.fc-dur{font-size:11px;color:var(--text3);margin-bottom:6px}
+.fc-line{display:flex;align-items:center;gap:3px}
+.fc-dot{width:5px;height:5px;border-radius:50%;background:var(--border);flex-shrink:0}
+.fc-dash{flex:1;height:1px;background:var(--border)}
+.fc-plane{font-size:13px;color:var(--text3)}
+.fc-aircraft{font-size:10px;color:var(--text3);margin-top:5px}
+.fc-right{text-align:right}
+.fc-footer{margin-top:12px;padding-top:10px;border-top:1px solid var(--border);font-size:11px;color:var(--text3);display:flex;flex-wrap:wrap;gap:10px}
+.fc-intl{display:inline-block;font-size:10px;padding:2px 7px;border-radius:99px;background:var(--hzh-bg);color:var(--hzh);font-weight:500;margin-left:6px}
+.fc-dom{display:inline-block;font-size:10px;padding:2px 7px;border-radius:99px;background:#f0f0f0;color:var(--text3);font-weight:500;margin-left:6px}
+
+/* OVERNIGHT BANNER */
+.overnight{border:1px solid #d4b0ff;border-radius:10px;background:#f8f5ff;padding:14px 16px;margin-bottom:22px}
+.overnight h4{font-size:13px;font-weight:500;color:var(--dep);margin-bottom:4px}
+.overnight p{font-size:12px;color:#6644aa;line-height:1.6}
+
+/* SECTION HEADING */
+.section-heading{font-size:11px;font-weight:500;letter-spacing:.05em;text-transform:uppercase;color:var(--text3);margin-bottom:14px;margin-top:28px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+
+@media(max-width:700px){
+  #sidebar{width:220px;min-width:220px}
+  #main{padding:24px 20px}
+}
+</style>
+</head>
+<body>
+
+<div id="sidebar">
+  <div id="sidebar-header">
+    <h1>China<br><em>May 2026</em></h1>
+    <p>Sydney · Hangzhou · Shanghai · Nanjing</p>
+  </div>
+  <div id="day-list"></div>
+</div>
+
+<div id="main">
+  <div id="day-content"></div>
+</div>
+
+<script>
+const DAYS = [
+  {
+    id:1, date:"Fri 16 May", city:"hzh", cityLabel:"Hangzhou", phase:"Arrive",
+    title:"Arrival", sub:"Land 23:10 · via Guangzhou",
+    summary:"A long travel day from Sydney via Guangzhou. You'll clear Chinese immigration at Guangzhou Baiyun — your first port of entry — then take the connecting flight to Hangzhou, landing just after 11pm. Expect to reach family around midnight.",
+    stats:[{l:"Arrive",v:"23:10 HGH"},{l:"Stay",v:"Family home"},{l:"Pace",v:"Travel day"}],
+    flights:[
+      {label:"CZ8092 · International",type:"intl",from:"SYD",fromCity:"Sydney Kingsford Smith",dep:"Departs Sydney",depT:"Terminal 1",to:"CAN",toCity:"Guangzhou Baiyun",arr:"Arrives Guangzhou",arrT:"Terminal 2",dur:"~9 hrs · Boeing 787-9",note:"Clear immigration & customs here · Confirm bags are through-checked to HGH"},
+      {label:"Connecting flight · Domestic",type:"dom",from:"CAN",fromCity:"Guangzhou Baiyun",dep:"21:00",depT:"Terminal 2",to:"HGH",toCity:"Hangzhou Xiaoshan",arr:"23:10",arrT:"Terminal 4",dur:"~2 hrs 10 min",note:"No immigration on arrival · Didi or family pickup ~35 min to city"}
+    ],
+    items:[
+      {time:"At Guangzhou",type:"alert",title:"Immigration & customs",desc:"First port of entry into China. Have passport, arrival card and accommodation address ready. Allow 60–90 min for the international → domestic transfer across Baiyun T2.",tags:[{c:"warn",t:"Immigration here"},{c:"transport",t:"60–90 min transfer"}]},
+      {time:"23:10",type:"transport",title:"Land Hangzhou Xiaoshan (T4)",desc:"Baggage claim, then out to arrivals hall. Family pickup or Didi to home — 35–50 min depending on traffic.",tags:[{c:"transport",t:"HGH Terminal 4"}]},
+      {time:"~00:30",type:"food",title:"Arrive home · late supper",desc:"Family will have food waiting. Eat, decompress, get to bed. No sightseeing tonight — Day 2 is your first real day.",tags:[{c:"food",t:"Late supper at home"}]}
+    ]
+  },
+  {
+    id:2, date:"Sat 17 May", city:"hzh", cityLabel:"Hangzhou", phase:"Family",
+    title:"Longjing & Lingyin", sub:"Tea · temples · West Lake",
+    summary:"Your first full day. Start in the tea hills above the city while the morning is cool, then head to Lingyin Temple in the forest, and finish with a lazy afternoon on West Lake. Classic Hangzhou.",
+    stats:[{l:"Walk",v:"~8 km"},{l:"Cost",v:"~¥150"},{l:"Pace",v:"Leisurely"}],
+    items:[
+      {time:"8:00 am",type:"rest",title:"Longjing tea village",desc:"Dragon Well tea village is at its best in May — the spring harvest is still on. Walk a few lanes back from the main road to buy from local growers. Sit down, watch the leaves being pan-fried, have a cup.",tags:[{c:"food",t:"Buy 50g to take home"},{c:"",t:"30 min from city"}]},
+      {time:"10:30 am",type:"history",title:"Lingyin Temple",desc:"One of China's most important Buddhist temples, set in forested hills. Don't miss the Feilai Feng cliff carvings — hundreds of rock-cut Buddhas along a stream path. Allow 2 hours.",tags:[{c:"",t:"¥45 entry"}]},
+      {time:"1:00 pm",type:"food",title:"Lunch — Zhiweiguan",desc:"Century-old restaurant famous for Hangzhou classics: beggar's chicken (baked in clay), dongpo pork, and osmanthus cake. Worth booking ahead or arriving before the queue builds.",tags:[{c:"food",t:"Beggar's chicken"},{c:"food",t:"Dongpo pork"}]},
+      {time:"3:00 pm",type:"rest",title:"West Lake boat ride",desc:"45-minute boat tour to the Three Pools Mirroring the Moon pavilions. The lake is at its best in May — willow trees in full leaf, water calm.",tags:[{c:"",t:"¥45 per person"}]},
+      {time:"5:00 pm",type:"food",title:"Hefang Street snacks",desc:"Old pedestrian street packed with traditional vendors. Try: stinky tofu, osmanthus glutinous rice cake, scallion flatbread.",tags:[{c:"food",t:"Stinky tofu"},{c:"food",t:"Osmanthus cake"}]},
+      {time:"7:30 pm",type:"food",title:"Family dinner",desc:"Last evening together before your solo leg. Suggest requesting West Lake vinegar fish — the definitive Hangzhou dish.",tags:[{c:"food",t:"West Lake vinegar fish"}]}
+    ]
+  },
+  {
+    id:3, date:"Sun 18 May", city:"sha", cityLabel:"Shanghai", phase:"Solo",
+    title:"Arrive Shanghai", sub:"The Bund · Yu Garden · rooftop",
+    summary:"Solo leg begins. An hour on the G-train and you're in a completely different world. Spend the afternoon on the Bund and in the Old City, then watch the Pudong skyline light up from a rooftop bar.",
+    stats:[{l:"Train",v:"Hangzhou E → Shanghai (~1 hr)"},{l:"Cost",v:"¥73–80"},{l:"Solo",v:"Begins today"}],
+    items:[
+      {time:"8:30 am",type:"transport",title:"G-train to Shanghai Hongqiao",desc:"Trains leave Hangzhou East every 20–30 min. Book on 12306 or Trip.com the night before. Smooth, fast, on-board WiFi.",tags:[{c:"transport",t:"G-train ~58 min"},{c:"transport",t:"¥73–80 2nd class"}]},
+      {time:"10:00 am",type:"rest",title:"Check into hotel",desc:"Stay in Jing'an, Huangpu or Xuhui for easy access to everything. Budget ¥400–800/night for a comfortable mid-range.",tags:[{c:"",t:"¥400–800/night"}]},
+      {time:"11:30 am",type:"history",title:"The Bund",desc:"Walk the full 1.5 km waterfront promenade — colonial buildings on one side, Pudong's futuristic skyline across the river. Morning is quieter than late afternoon.",tags:[]},
+      {time:"1:00 pm",type:"food",title:"Lunch — Lost Heaven",desc:"Yunnan-style cuisine in a gorgeous colonial building right on the Bund. Great atmosphere, rich flavours. Sit at the bar if solo.",tags:[{c:"food",t:"Yunnan cuisine"},{c:"",t:"Book ahead"}]},
+      {time:"3:00 pm",type:"history",title:"Yu Garden + Old City Bazaar",desc:"16th-century classical garden in the heart of the old city. The surrounding bazaar is touristy but the garden itself is genuinely beautiful and tranquil. Allow 90 min.",tags:[{c:"",t:"¥40 entry"},{c:"",t:"~90 min"}]},
+      {time:"5:30 pm",type:"rest",title:"Pudong skyline at dusk",desc:"Return to the Bund as the sun drops. The best 30-minute photography window of the trip — the towers light up dramatically.",tags:[]},
+      {time:"8:00 pm",type:"night",title:"Bar Rouge — Bund 18, Level 7",desc:"One of Shanghai's most famous rooftop bars with sweeping Pudong views. Lively on Sunday evenings without being rowdy. Smart casual dress.",tags:[{c:"night",t:"Rooftop view"},{c:"",t:"Cocktails ¥90–130"},{c:"",t:"Smart casual"}]}
+    ]
+  },
+  {
+    id:4, date:"Mon 19 May", city:"sha", cityLabel:"Shanghai", phase:"Solo",
+    title:"French Concession", sub:"Wukang Rd · Tianzifang · nightlife",
+    summary:"The best day in Shanghai. The French Concession is one of the great urban neighbourhoods in Asia — tree-lined boulevards, Art Deco villas, outstanding food, and a nightlife scene that runs late. Take it slowly.",
+    stats:[{l:"Walk",v:"~10 km"},{l:"Vibe",v:"Urban cool"},{l:"Pace",v:"Relaxed"}],
+    items:[
+      {time:"9:00 am",type:"food",title:"Brunch — Farine (Ferguson Lane)",desc:"Best pastries and coffee in the French Concession. The croissants are exceptional. Sit in the courtyard if the weather allows.",tags:[{c:"food",t:"Best croissants in Shanghai"}]},
+      {time:"10:30 am",type:"history",title:"Wukang Road walk",desc:"The most photographed street in Shanghai. Art Deco villas turned boutiques, a wisteria-covered building at the bend, independent galleries in the laneways. Walk slowly — the side streets are where it gets interesting.",tags:[]},
+      {time:"1:00 pm",type:"food",title:"Lunch — Jia Jia Tang Bao",desc:"Legendary xiaolongbao (soup dumplings). Queue moves fast. Order the pork and crab roe basket — extraordinary at about ¥40.",tags:[{c:"food",t:"Xiaolongbao"},{c:"",t:"Cash only ~¥40/basket"}]},
+      {time:"2:30 pm",type:"history",title:"Tianzifang",desc:"Maze of 1930s shikumen laneways converted into galleries, craft shops and cafés. Good for a slow browse — find a spot on one of the upper-level terraces with a cold drink.",tags:[]},
+      {time:"5:00 pm",type:"rest",title:"Xintiandi + K11 Musea",desc:"Xintiandi is polished shikumen neighbourhood with upscale bars. K11 Musea is an interesting art-focused mall nearby — worth a walk through.",tags:[]},
+      {time:"7:30 pm",type:"food",title:"Dinner — Jesse Restaurant",desc:"Old-school Shanghai home cooking. Red-braised pork, smoked fish, yellow croaker with tofu. Affordable, deeply local, no English menu — point at what your neighbours are eating.",tags:[{c:"food",t:"Shanghai home cooking"}]},
+      {time:"9:00 pm",type:"night",title:"Yongkang Road bar crawl",desc:"A short street packed with small cocktail bars, wine bars and craft beer spots. Busy from 9 pm — mix of locals and expats. Very walkable, you can try three or four in a row.",tags:[{c:"night",t:"Busy from 9 pm"},{c:"night",t:"Local crowd Mon–Wed"}]}
+    ]
+  },
+  {
+    id:5, date:"Tue 20 May", city:"njg", cityLabel:"Nanjing", phase:"Solo",
+    title:"Arrive Nanjing", sub:"Fuzimiao · Qinhuai River · duck",
+    summary:"Morning at leisure in Shanghai, then a quick G-train hop to Nanjing. A historically richer city than Shanghai and far less visited by tourists. Your first evening in the ancient Confucius Temple precinct sets the tone perfectly.",
+    stats:[{l:"Train",v:"Shanghai → Nanjing (~1.5 hr)"},{l:"Cost",v:"~¥134"},{l:"Check-in",v:"Afternoon"}],
+    items:[
+      {time:"9:00 am",type:"rest",title:"Morning at leisure in Shanghai",desc:"Grab coffee in the French Concession. Optional: Jing'an Temple (impressive exterior, free to walk by) or a final wander through Anfu Road.",tags:[]},
+      {time:"11:30 am",type:"food",title:"Quick lunch before departing",desc:"Yang's Braised Pork Rice on Huanghe Road — fast, cheap, delicious. Queue moves in 10 min.",tags:[{c:"food",t:"Braised pork rice ¥20"}]},
+      {time:"1:30 pm",type:"transport",title:"G-train to Nanjing South",desc:"Shanghai Hongqiao → Nanjing South. ~1 hr 20 min. Very frequent. Nanjing South is a huge station — take Metro Line 1 or 3 into the city.",tags:[{c:"transport",t:"~¥134 2nd class"},{c:"transport",t:"Trains every 20 min"}]},
+      {time:"4:00 pm",type:"rest",title:"Check in",desc:"Stay near Fuzimiao or Xinjiekou (city centre) for easy access to everything. Budget ¥350–700/night.",tags:[{c:"",t:"Near Fuzimiao recommended"}]},
+      {time:"5:30 pm",type:"history",title:"Confucius Temple (Fuzimiao)",desc:"Ancient temple complex and surrounding pedestrian precinct — the best first-evening walk in Nanjing. Atmospheric, historic, and full of food stalls. Start here to get your bearings.",tags:[]},
+      {time:"7:00 pm",type:"food",title:"Dinner — Qinhuai snack street",desc:"Nanjing's signature dishes in one place: duck blood and vermicelli soup (鸭血粉丝汤), salt-baked duck (盐水鸭), pan-fried Nanjing dumplings. Walk and eat.",tags:[{c:"food",t:"Duck blood soup"},{c:"food",t:"Salt-baked duck"}]},
+      {time:"8:30 pm",type:"night",title:"Qinhuai River night walk",desc:"The canal lit with red lanterns at night is one of the most beautiful sights in China. Walk both banks of the Fuzimiao section.",tags:[{c:"night",t:"Most beautiful at night"}]}
+    ]
+  },
+  {
+    id:6, date:"Wed 21 May", city:"njg", cityLabel:"Nanjing", phase:"Solo",
+    title:"Purple Mountain", sub:"Ming tombs · Memorial · duck dinner",
+    summary:"The most historically dense day of the trip. Purple Mountain holds two of China's great monuments. The afternoon at the Massacre Memorial is sobering and important — allow proper time and go with the right headspace.",
+    stats:[{l:"Walk",v:"~12 km"},{l:"Note",v:"Emotionally full day"},{l:"Pace",v:"Measured"}],
+    items:[
+      {time:"8:00 am",type:"history",title:"Ming Xiaoling Mausoleum",desc:"Burial site of the Hongwu Emperor. The Sacred Way — lined with enormous stone animal and official statues — is one of the great processional paths in Asia. Set in forest, beautiful in the morning before tour groups arrive.",tags:[{c:"",t:"¥70 entry"},{c:"",t:"Arrive early"}]},
+      {time:"10:30 am",type:"history",title:"Sun Yat-sen Mausoleum",desc:"392 steps up Purple Mountain to the marble mausoleum of modern China's founding father. Worth every step — the view from the top over Nanjing is outstanding.",tags:[{c:"",t:"¥80 entry"},{c:"transport",t:"~20 min from Xiaoling"}]},
+      {time:"1:00 pm",type:"food",title:"Lunch near Purple Mountain",desc:"Pan-fried beef noodles (牛肉锅贴) at the base of the mountain — a Nanjing specialty worth seeking out.",tags:[{c:"food",t:"Pan-fried beef noodles"}]},
+      {time:"3:00 pm",type:"history",title:"Nanjing Massacre Memorial Hall",desc:"Documents the 1937 massacre. One of the most important historical sites in China — sobering, essential, and very well curated. Photography restricted in the main hall. Allow 2–2.5 hours minimum.",tags:[{c:"warn",t:"Free entry, bring passport"},{c:"warn",t:"Allow 2.5 hrs"},{c:"",t:"Photography restricted inside"}]},
+      {time:"6:00 pm",type:"rest",title:"Rest at hotel",desc:"A heavy day — give yourself time to decompress before going out again.",tags:[]},
+      {time:"8:00 pm",type:"food",title:"Dinner — local duck restaurant",desc:"Nanjing is the duck capital of China. Order half a salt-baked duck, edamame, cold tofu with pickles, and a local Jinling beer. Simple and deeply satisfying.",tags:[{c:"food",t:"Salt-baked duck"},{c:"food",t:"Jinling beer"}]}
+    ]
+  },
+  {
+    id:7, date:"Thu 22 May", city:"njg", cityLabel:"Nanjing", phase:"Solo",
+    title:"City Wall → Hangzhou", sub:"Ancient walls · Xuanwu Lake · home",
+    summary:"A gentler morning on Nanjing's extraordinary Ming-dynasty city wall before returning to Hangzhou and your family. Solo leg complete.",
+    stats:[{l:"Train",v:"Nanjing → Hangzhou (~2 hr)"},{l:"Cost",v:"~¥134"},{l:"Arrive",v:"Afternoon"}],
+    items:[
+      {time:"8:30 am",type:"history",title:"Ancient City Wall — Xuanwu section",desc:"The longest city wall in the world at 35 km. Walk the restored section along Xuanwu Lake — views over the water and the old gates are extraordinary. Access from Zhongyang Gate.",tags:[{c:"",t:"¥35 wall entry"},{c:"",t:"~1.5 hrs this section"}]},
+      {time:"10:00 am",type:"rest",title:"Xuanwu Lake Park",desc:"A huge city lake enclosed by the old walls, with causeways to small islands. Free entry — a peaceful final morning walk.",tags:[]},
+      {time:"12:00 pm",type:"food",title:"Last Nanjing lunch — duck blood soup",desc:"One more bowl before you leave. The best spots are small shopfront or basement noodle shops — ask hotel staff for their local pick.",tags:[{c:"food",t:"Final duck soup"}]},
+      {time:"1:30 pm",type:"transport",title:"G-train back to Hangzhou",desc:"Nanjing South → Hangzhou East. ~2 hrs. Trains every 30–40 min. You'll be back with family by late afternoon.",tags:[{c:"transport",t:"~¥134 2nd class"},{c:"transport",t:"~2 hrs"}]},
+      {time:"4:00 pm",type:"rest",title:"Reunite with family",desc:"Solo leg complete. Three cities, seven days. Go home, unpack, share stories.",tags:[]},
+      {time:"7:30 pm",type:"food",title:"Family dinner",desc:"Bring something back: Nanjing salt-baked duck travels well, as do Jinling cloud cakes (云片糕) as gifts.",tags:[{c:"food",t:"Bring duck as a souvenir"}]}
+    ]
+  },
+  {
+    id:8, date:"Fri 23 May", city:"hzh", cityLabel:"Hangzhou", phase:"Family",
+    title:"Tea Museum & Wetlands", sub:"Culture · nature · relaxed",
+    summary:"A deliberately gentle day back with family. The Tea Museum is genuinely world-class and completely free. Xixi Wetlands in the afternoon is the most different landscape you'll see on this trip — urban marshland, ancient fishing villages, total calm.",
+    stats:[{l:"Pace",v:"Relaxed"},{l:"Cost",v:"~¥120"},{l:"Walk",v:"~6 km"}],
+    items:[
+      {time:"9:00 am",type:"history",title:"National Tea Museum",desc:"One of the best tea museums in the world, set in the tea-producing hills. Free entry. Beautiful architecture, peaceful garden walks, and tasting sessions of many varieties. Allow 2 hours.",tags:[{c:"",t:"Free entry"},{c:"food",t:"Tea tasting included"}]},
+      {time:"11:30 am",type:"food",title:"Lunch — local neighbourhood spot",desc:"Ask family for their favourite. Neighbourhood noodle or rice shops always beat anything a tourist would find.",tags:[]},
+      {time:"2:00 pm",type:"rest",title:"Xixi Wetlands National Park",desc:"Urban wetland with boat rides through reed marshes and ancient fishing villages. Serene, photogenic, completely different from anything in Shanghai or Nanjing. Half-day is plenty.",tags:[{c:"",t:"¥80 park entry"},{c:"",t:"¥40 boat ride"}]},
+      {time:"7:00 pm",type:"food",title:"Family dinner",desc:"Enjoy a long evening at home. Let the week catch up with you.",tags:[]}
+    ]
+  },
+  {
+    id:9, date:"Sat 24 May", city:"hzh", cityLabel:"Hangzhou", phase:"Family",
+    title:"Wuzhen Water Town", sub:"Canal houses · crafts · lanterns",
+    summary:"A day trip to Wuzhen — one of the best-preserved water towns in China. Whitewashed houses on stilts, stone bridges, wooden boats on the canals. Get there early for the best light before tour groups arrive.",
+    stats:[{l:"Distance",v:"~80 km from Hangzhou"},{l:"Entry",v:"¥150"},{l:"Return",v:"Evening"}],
+    items:[
+      {time:"8:30 am",type:"transport",title:"Travel to Wuzhen",desc:"Bus from Hangzhou North Bus Terminal ~1.5 hrs (~¥30), or arrange a car with family. Arrive by 10 am for the best morning light and smaller crowds.",tags:[{c:"transport",t:"Bus ¥30 each way"},{c:"transport",t:"~1.5 hrs"}]},
+      {time:"10:00 am",type:"history",title:"Wuzhen West Zone",desc:"The most photogenic section — preserved canal townhouses on stilts, stone arch bridges, punted wooden boats. Morning mist still on the water. Walk slowly. The narrow lanes off the main canal are quieter.",tags:[{c:"",t:"¥150 entry"},{c:"",t:"Arrive early"}]},
+      {time:"1:00 pm",type:"food",title:"Lunch inside Wuzhen",desc:"Eat along the canal. Try water buffalo rice, hand-made tofu, and a cup of Sanbai rice wine — the local specialty that's been made here for 1,000 years.",tags:[{c:"food",t:"Water buffalo rice"},{c:"food",t:"Sanbai rice wine"}]},
+      {time:"3:00 pm",type:"history",title:"East Zone — dye workshops & crafts",desc:"Blue calico fabric dyeing, shadow puppet shows, bronze casting demonstrations. More craft-focused and quieter than the West Zone.",tags:[]},
+      {time:"5:00 pm",type:"transport",title:"Return to Hangzhou",desc:"Bus back in time for a relaxed evening. If staying for the lantern lighting (~6 pm) the last buses leave around 8 pm.",tags:[]},
+      {time:"7:30 pm",type:"food",title:"Hefang Street farewell snack run",desc:"Pick up last-minute snacks and gifts: Longjing tea, vacuum-packed osmanthus products, dried plums. Last chance before departure tomorrow.",tags:[{c:"food",t:"Buy Longjing tea to take home"}]}
+    ]
+  },
+  {
+    id:10, date:"Sun 25 May", city:"dep", cityLabel:"Departure", phase:"Depart",
+    title:"Final morning & fly out", sub:"West Lake farewell · CZ3502 18:35",
+    summary:"Last morning in Hangzhou. A final walk on West Lake, a long family lunch, then an afternoon departure for Guangzhou. You'll overnight in Guangzhou before your early morning flight home.",
+    stats:[{l:"Depart HGH",v:"18:35 · CZ3502"},{l:"At airport",v:"By 16:30"},{l:"Overnight",v:"Guangzhou"}],
+    flights:[
+      {label:"CZ3502 · Domestic",type:"dom",from:"HGH",fromCity:"Hangzhou Xiaoshan",dep:"18:35",depT:"Terminal 4",to:"CAN",toCity:"Guangzhou Baiyun",arr:"~20:50",arrT:"Terminal 2",dur:"~2 hrs 15 min · A330-300",note:"On-time rating 4.6/5 · Leave for airport by 16:30"}
+    ],
+    overnight:{title:"Overnight in Guangzhou · ~11 hrs",desc:"CZ3502 arrives ~20:50 and CZ301 departs 08:00 the next morning. Recommend the Novotel Guangzhou Baiyun Airport — connected to T2 by walkway. Book ahead. Be back at T2 check-in by 06:00 (closes 07:15)."},
+    items:[
+      {time:"9:00 am",type:"rest",title:"Final West Lake walk",desc:"Su Causeway in the morning — longer and quieter than Bai Causeway, with mist still on the water. Take your time.",tags:[]},
+      {time:"11:30 am",type:"food",title:"Final family lunch",desc:"Let the family choose the restaurant. Long, slow, lots of dishes, probably some toasting. This is the one.",tags:[]},
+      {time:"2:30 pm",type:"rest",title:"Pack up · sort gifts",desc:"Confirm VPN and Didi are working on your phone. Pack tea, snacks, any shopping. Longjing tea in sealed bags is fine through Australian customs.",tags:[{c:"",t:"Sealed tea: OK for customs"},{c:"transport",t:"Didi to airport ~40 min"}]},
+      {time:"4:30 pm",type:"transport",title:"Leave for Hangzhou Xiaoshan Airport",desc:"Allow 40–50 min. Check-in for domestic is usually quick but give yourself buffer time.",tags:[{c:"transport",t:"HGH Terminal 4"}]},
+      {time:"18:35",type:"transport",title:"CZ3502 departs Hangzhou",desc:"Domestic leg to Guangzhou Baiyun T2. ~2 hrs 15 min. No immigration. Arrive ~20:50.",tags:[{c:"transport",t:"CAN T2 on arrival"}]},
+      {time:"~21:30",type:"rest",title:"Check into airport hotel — Guangzhou",desc:"Novotel Baiyun Airport is connected to T2 by walkway. Sleep. Early start tomorrow.",tags:[{c:"",t:"Novotel directly connected to T2"},{c:"warn",t:"Set alarm for 5:30 am"}]}
+    ]
+  },
+  {
+    id:11, date:"Mon 26 May", city:"dep", cityLabel:"Departure", phase:"Fly home",
+    title:"Guangzhou → Sydney", sub:"CZ301 · home by evening",
+    summary:"An early start for the long flight home. You'll land back in Sydney by early evening after a 9.5-hour flight.",
+    stats:[{l:"Departs",v:"08:00 · CZ301"},{l:"Arrives SYD",v:"19:25 AEST"},{l:"At T2",v:"By 06:00"}],
+    flights:[
+      {label:"CZ301 · International",type:"intl",from:"CAN",fromCity:"Guangzhou Baiyun",dep:"08:00",depT:"Terminal 2 · Gate A154",to:"SYD",toCity:"Sydney Kingsford Smith",arr:"19:25 AEST",arrT:"Terminal 1 · Gate 24",dur:"~9 hrs 25 min · Airbus A350-900",note:"Check-in closes 07:15 · Be at T2 by 06:00 · 88% on-time performance"}
+    ],
+    items:[
+      {time:"05:30 am",type:"transport",title:"Wake up · head to Terminal 2",desc:"5 min walk from the Novotel to T2. Check-in closes 07:15 — don't leave it late. International check-in queues can build quickly.",tags:[{c:"warn",t:"Check-in closes 07:15"}]},
+      {time:"08:00",type:"transport",title:"CZ301 departs Guangzhou",desc:"Airbus A350-900 to Sydney. Non-stop, ~9 hrs 25 min. Gains 2 hours crossing into the AEST timezone.",tags:[{c:"transport",t:"Non-stop · A350-900"}]},
+      {time:"19:25 AEST",type:"rest",title:"Land Sydney Kingsford Smith",desc:"Terminal 1. Australian Border Force, biosecurity, baggage. Taxis, Uber and train (Airport Link) all from the terminal.",tags:[{c:"",t:"T1 International, SYD"},{c:"",t:"Train: Airport Link direct"}]}
+    ]
+  }
+];
+
+const cityColor={hzh:"c-hzh",sha:"c-sha",njg:"c-njg",dep:"c-dep"};
+const cityText={hzh:"c-hzh-t",sha:"c-sha-t",njg:"c-njg-t",dep:"c-dep-t"};
+let current=0;
+
+function buildSidebar(){
+  const list=document.getElementById('day-list');
+  list.innerHTML=DAYS.map((d,i)=>`
+    <div class="day-item ${cityColor[d.city]} ${i===current?'active':''}" onclick="selectDay(${i})">
+      <div class="day-accent"></div>
+      <div class="day-inner">
+        <div class="day-meta">
+          <span class="day-num">${d.date}</span>
+          <span class="day-pill">${d.cityLabel}</span>
+        </div>
+        <div class="day-title">${d.title}</div>
+        <div class="day-sub">${d.sub}</div>
+      </div>
+    </div>`).join('');
+}
+
+function renderFlight(f){
+  return`<div class="flight-card">
+    <div class="fc-label">${f.label}<span class="${f.type==='intl'?'fc-intl':'fc-dom'}">${f.type==='intl'?'International':'Domestic'}</span></div>
+    <div class="fc-row">
+      <div>
+        <div class="fc-iata">${f.from}</div>
+        <div class="fc-city">${f.fromCity}</div>
+        <div class="fc-time">${f.dep}</div>
+        <div class="fc-terminal">${f.depT}</div>
+      </div>
+      <div class="fc-mid">
+        <div class="fc-dur">${f.dur}</div>
+        <div class="fc-line"><div class="fc-dot"></div><div class="fc-dash"></div><span class="fc-plane">✈</span><div class="fc-dash"></div><div class="fc-dot"></div></div>
+        <div class="fc-aircraft">China Southern</div>
+      </div>
+      <div class="fc-right">
+        <div class="fc-iata">${f.to}</div>
+        <div class="fc-city">${f.toCity}</div>
+        <div class="fc-time">${f.arr}</div>
+        <div class="fc-terminal">${f.arrT}</div>
+      </div>
+    </div>
+    <div class="fc-footer">${f.note}</div>
+  </div>`;
+}
+
+function renderItem(item){
+  const icons={transport:'✈',food:'◉',history:'▲',night:'◐',alert:'!',rest:'○'};
+  const tags=item.tags.map(t=>`<span class="tag ${t.c}">${t.t}</span>`).join('');
+  return`<div class="tl-item">
+    <div class="tl-icon ${item.type}">${icons[item.type]||'○'}</div>
+    <div class="tl-time">${item.time}</div>
+    <div class="tl-title">${item.title}</div>
+    <div class="tl-desc">${item.desc}</div>
+    ${tags?`<div class="tags">${tags}</div>`:''}
+  </div>`;
+}
+
+function selectDay(i){
+  current=i;
+  buildSidebar();
+  renderDay();
+  document.getElementById('main').scrollTop=0;
+}
+
+function renderDay(){
+  const d=DAYS[current];
+  const ct=cityText[d.city];
+  let html=`
+    <div class="dc-eyebrow ${ct}">${d.cityLabel} · ${d.phase}</div>
+    <div class="dc-heading">${d.title}</div>
+    <div class="dc-date">${d.date}</div>
+    <div class="dc-summary">${d.summary}</div>
+    <div class="stat-row">${d.stats.map(s=>`<div class="stat"><div class="stat-label">${s.l}</div><div class="stat-val">${s.v}</div></div>`).join('')}</div>`;
+  if(d.flights&&d.flights.length){
+    html+=`<div class="section-heading">Flights</div>`;
+    html+=d.flights.map(renderFlight).join('');
+  }
+  if(d.overnight){
+    html+=`<div class="overnight"><h4>🌙 ${d.overnight.title}</h4><p>${d.overnight.desc}</p></div>`;
+  }
+  if(d.items&&d.items.length){
+    html+=`<div class="section-heading">Schedule</div><div class="timeline">${d.items.map(renderItem).join('')}</div>`;
+  }
+  document.getElementById('day-content').innerHTML=html;
+}
+
+buildSidebar();
+renderDay();
+</script>
+</body>
+</html>

@@ -2,25 +2,56 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>China · May 2026</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 :root{
   --hzh:#1a5c9a;--hzh-bg:#e8f1fa;--hzh-light:#f0f6fc;
   --sha:#1a7a52;--sha-bg:#e6f4ed;--sha-light:#f0faf5;
   --njg:#8a5a00;--njg-bg:#fdf0d5;--njg-light:#fffbf0;
   --dep:#4a3580;--dep-bg:#f0edfb;--dep-light:#f8f6fe;
   --text:#1a1a1a;--text2:#555;--text3:#888;
-  --border:#e5e5e5;--bg:#fafaf8;--white:#ffffff;
+  --border:#e5e5e5;--bg:#fafaf8;--white:#fff;
+  --radius:10px;
 }
-body{font-family:'DM Sans',system-ui,sans-serif;background:var(--bg);color:var(--text);display:flex;height:100vh;overflow:hidden;font-size:14px}
+
+/* ── BASE ─────────────────────────────────────────────────────────── */
+body{font-family:'DM Sans',system-ui,sans-serif;background:var(--bg);color:var(--text);font-size:14px;min-height:100vh}
+button{font-family:inherit;cursor:pointer;border:none;background:none}
+
+/* ── MOBILE NAV (hidden on desktop) ─────────────────────────────── */
+#mobile-nav{display:none;position:sticky;top:0;z-index:100;background:var(--white);border-bottom:1px solid var(--border)}
+#mobile-header{display:flex;align-items:center;padding:12px 16px 8px;gap:10px}
+#mobile-title{font-family:'Playfair Display',serif;font-size:16px;font-weight:400}
+#mobile-city-pill{font-size:11px;padding:2px 9px;border-radius:99px;font-weight:500;margin-left:auto}
+.mob-pill-hzh{background:var(--hzh-bg);color:var(--hzh)}
+.mob-pill-sha{background:var(--sha-bg);color:var(--sha)}
+.mob-pill-njg{background:var(--njg-bg);color:var(--njg)}
+.mob-pill-dep{background:var(--dep-bg);color:var(--dep)}
+#mobile-day-strip{display:flex;gap:6px;overflow-x:auto;padding:0 16px 10px;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+#mobile-day-strip::-webkit-scrollbar{display:none}
+.mob-day-btn{flex-shrink:0;display:flex;flex-direction:column;align-items:center;padding:7px 10px;border-radius:8px;border:1.5px solid var(--border);background:var(--white);min-width:52px;scroll-snap-align:start;transition:all .15s;gap:1px}
+.mob-day-btn .md{font-size:13px;font-weight:500;color:var(--text)}
+.mob-day-btn .mw{font-size:10px;color:var(--text3)}
+.mob-day-btn.active-hzh{border-color:var(--hzh);background:var(--hzh-bg)}
+.mob-day-btn.active-hzh .md{color:var(--hzh)}
+.mob-day-btn.active-sha{border-color:var(--sha);background:var(--sha-bg)}
+.mob-day-btn.active-sha .md{color:var(--sha)}
+.mob-day-btn.active-njg{border-color:var(--njg);background:var(--njg-bg)}
+.mob-day-btn.active-njg .md{color:var(--njg)}
+.mob-day-btn.active-dep{border-color:var(--dep);background:var(--dep-bg)}
+.mob-day-btn.active-dep .md{color:var(--dep)}
+.mob-day-btn .color-bar{width:20px;height:3px;border-radius:99px;margin-top:3px}
+
+/* ── DESKTOP LAYOUT ──────────────────────────────────────────────── */
+#app{display:flex;height:100vh;overflow:hidden}
 #sidebar{width:256px;min-width:256px;background:var(--white);border-right:1px solid var(--border);overflow-y:auto;display:flex;flex-direction:column;flex-shrink:0}
 #sidebar-header{padding:20px 20px 14px;border-bottom:1px solid var(--border);flex-shrink:0}
-#sidebar-header h1{font-family:'Playfair Display',Georgia,serif;font-size:19px;font-weight:400;line-height:1.2;margin-bottom:4px}
+#sidebar-header h1{font-family:'Playfair Display',serif;font-size:19px;font-weight:400;line-height:1.2;margin-bottom:4px}
 #sidebar-header p{font-size:11px;color:var(--text3);letter-spacing:.04em;text-transform:uppercase}
 .day-item{display:flex;align-items:stretch;cursor:pointer;border-bottom:1px solid var(--border);transition:background .12s;position:relative}
 .day-item:hover{background:#f5f5f3}
@@ -30,39 +61,45 @@ body{font-family:'DM Sans',system-ui,sans-serif;background:var(--bg);color:var(-
 .day-item.active.c-njg::after{background:var(--njg)}
 .day-item.active.c-dep::after{background:var(--dep)}
 .day-accent{width:4px;flex-shrink:0}
-.c-hzh .day-accent{background:var(--hzh)}
-.c-sha .day-accent{background:var(--sha)}
-.c-njg .day-accent{background:var(--njg)}
-.c-dep .day-accent{background:var(--dep)}
+.c-hzh .day-accent{background:var(--hzh)}.c-sha .day-accent{background:var(--sha)}.c-njg .day-accent{background:var(--njg)}.c-dep .day-accent{background:var(--dep)}
 .day-inner{padding:10px 13px;flex:1;min-width:0}
 .day-meta{display:flex;align-items:center;gap:6px;margin-bottom:3px}
 .day-num{font-size:10px;font-weight:500;color:var(--text3);letter-spacing:.04em;text-transform:uppercase}
 .day-pill{font-size:10px;padding:1px 7px;border-radius:99px;font-weight:500;margin-left:auto;flex-shrink:0}
-.c-hzh .day-pill{background:var(--hzh-bg);color:var(--hzh)}
-.c-sha .day-pill{background:var(--sha-bg);color:var(--sha)}
-.c-njg .day-pill{background:var(--njg-bg);color:var(--njg)}
-.c-dep .day-pill{background:var(--dep-bg);color:var(--dep)}
+.c-hzh .day-pill{background:var(--hzh-bg);color:var(--hzh)}.c-sha .day-pill{background:var(--sha-bg);color:var(--sha)}.c-njg .day-pill{background:var(--njg-bg);color:var(--njg)}.c-dep .day-pill{background:var(--dep-bg);color:var(--dep)}
 .day-title{font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .day-sub{font-size:11px;color:var(--text3);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #main{flex:1;display:flex;overflow:hidden;min-width:0}
 #content-panel{flex:1;overflow-y:auto;padding:30px 34px;min-width:0}
 #day-content{max-width:560px}
-#map-panel{width:350px;min-width:350px;border-left:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;background:var(--white)}
+#map-panel{width:340px;min-width:340px;border-left:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;background:var(--white)}
 #map-header{padding:9px 13px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;flex-shrink:0}
 #map-title{font-size:11px;font-weight:500;color:var(--text2);text-transform:uppercase;letter-spacing:.05em}
 #map-type{font-size:10px;color:var(--text3);margin-left:auto;background:var(--bg);padding:2px 8px;border-radius:99px;border:1px solid var(--border)}
 #map-container{flex:1}
 #map-legend{padding:10px 13px;border-top:1px solid var(--border);font-size:11px;color:var(--text2);line-height:1.7;max-height:160px;overflow-y:auto;flex-shrink:0}
+
+/* ── MOBILE MAP (hidden on desktop) ─────────────────────────────── */
+#mobile-map-wrap{display:none;background:var(--white);border-bottom:1px solid var(--border)}
+#map-toggle-btn{width:100%;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;font-size:12px;font-weight:500;color:var(--text2);background:var(--white)}
+#map-toggle-btn span{font-size:11px;color:var(--text3);font-weight:400}
+#mobile-map-inner{overflow:hidden;transition:height .25s ease}
+#mobile-map-container{height:230px;width:100%}
+#mobile-map-legend{padding:8px 16px;font-size:11px;color:var(--text2);line-height:1.7;border-top:1px solid var(--border);background:var(--bg)}
+
+/* ── LEAFLET ─────────────────────────────────────────────────────── */
 .leaflet-container{background:#eee9df}
 .leaflet-control-attribution{font-size:9px!important}
-.loc-marker{width:22px;height:22px;border-radius:50%;border:2px solid white;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:white;box-shadow:0 1px 4px rgba(0,0,0,.3);font-family:'DM Sans',sans-serif;line-height:1}
+.loc-marker{width:22px;height:22px;border-radius:50%;border:2px solid white;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:white;box-shadow:0 1px 4px rgba(0,0,0,.3);line-height:1}
+
+/* ── CONTENT SHARED ─────────────────────────────────────────────── */
 .dc-eyebrow{font-size:11px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;margin-bottom:7px}
 .c-hzh-t{color:var(--hzh)}.c-sha-t{color:var(--sha)}.c-njg-t{color:var(--njg)}.c-dep-t{color:var(--dep)}
-.dc-heading{font-family:'Playfair Display',Georgia,serif;font-size:25px;font-weight:400;line-height:1.2;margin-bottom:4px}
+.dc-heading{font-family:'Playfair Display',serif;font-size:25px;font-weight:400;line-height:1.2;margin-bottom:4px}
 .dc-date{font-size:12px;color:var(--text3);margin-bottom:6px}
-.dc-summary{font-size:13px;color:var(--text2);margin-bottom:18px;line-height:1.6;padding-bottom:16px;border-bottom:1px solid var(--border)}
-.stat-row{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:20px}
-.stat{background:var(--white);border:1px solid var(--border);border-radius:8px;padding:8px 12px;min-width:105px}
+.dc-summary{font-size:13px;color:var(--text2);margin-bottom:18px;line-height:1.65;padding-bottom:16px;border-bottom:1px solid var(--border)}
+.stat-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
+.stat{background:var(--white);border:1px solid var(--border);border-radius:8px;padding:8px 12px;min-width:100px;flex:1}
 .stat-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:2px}
 .stat-val{font-size:13px;font-weight:500}
 .section-heading{font-size:11px;font-weight:500;letter-spacing:.05em;text-transform:uppercase;color:var(--text3);margin:22px 0 12px;padding-bottom:6px;border-bottom:1px solid var(--border)}
@@ -88,7 +125,7 @@ body{font-family:'DM Sans',system-ui,sans-serif;background:var(--bg);color:var(-
 .tag.transport{border-color:#b5d0ee;background:var(--hzh-light);color:var(--hzh)}
 .tag.warn{border-color:#f5c6c6;background:#fdf5f5;color:#a33}
 .tag.night{border-color:#b5ddc8;background:var(--sha-light);color:var(--sha)}
-.flight-card{background:var(--white);border:1px solid var(--border);border-radius:10px;padding:13px 15px;margin-bottom:18px}
+.flight-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:13px 15px;margin-bottom:16px}
 .fc-label{font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.05em;color:var(--text3);margin-bottom:9px}
 .fc-row{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:8px}
 .fc-iata{font-family:'Playfair Display',serif;font-size:21px;font-weight:400}
@@ -104,36 +141,96 @@ body{font-family:'DM Sans',system-ui,sans-serif;background:var(--bg);color:var(-
 .fc-footer{margin-top:9px;padding-top:7px;border-top:1px solid var(--border);font-size:11px;color:var(--text3)}
 .fc-intl{display:inline-block;font-size:10px;padding:1px 6px;border-radius:99px;background:var(--hzh-bg);color:var(--hzh);font-weight:500;margin-left:5px}
 .fc-dom{display:inline-block;font-size:10px;padding:1px 6px;border-radius:99px;background:#f0f0f0;color:var(--text3);font-weight:500;margin-left:5px}
-.overnight{border:1px solid #d4b0ff;border-radius:10px;background:#f8f5ff;padding:11px 14px;margin-bottom:18px}
+.overnight{border:1px solid #d4b0ff;border-radius:var(--radius);background:#f8f5ff;padding:11px 14px;margin-bottom:16px}
 .overnight h4{font-size:13px;font-weight:500;color:var(--dep);margin-bottom:3px}
 .overnight p{font-size:12px;color:#6644aa;line-height:1.6}
+
+/* ── MOBILE STYLES ───────────────────────────────────────────────── */
+@media(max-width:767px){
+  body{overflow-y:auto;overflow-x:hidden}
+  #mobile-nav{display:block}
+  #mobile-map-wrap{display:block}
+  #app{display:block;height:auto;overflow:visible}
+  #sidebar{display:none}
+  #main{display:block;overflow:visible}
+  #map-panel{display:none}
+  #content-panel{padding:16px 16px 40px;overflow:visible}
+  #day-content{max-width:100%}
+  .dc-heading{font-size:22px}
+  .dc-summary{font-size:13px}
+  .stat{min-width:0}
+  .stat-val{font-size:12px}
+  .flight-card{padding:11px 13px}
+  .fc-iata{font-size:18px}
+  .fc-city{font-size:10px}
+  .tl-title{font-size:13px}
+  .tl-desc{font-size:12px}
+}
+
+/* ── TABLET ──────────────────────────────────────────────────────── */
+@media(min-width:768px) and (max-width:1023px){
+  #sidebar{width:200px;min-width:200px}
+  #map-panel{width:280px;min-width:280px}
+  #content-panel{padding:24px 24px}
+}
 </style>
 </head>
 <body>
-<div id="sidebar">
-  <div id="sidebar-header">
-    <h1>China<br><em>May 2026</em></h1>
-    <p>Sydney · Hangzhou · Shanghai · Nanjing</p>
+
+<!-- MOBILE ONLY: sticky header + day strip -->
+<div id="mobile-nav">
+  <div id="mobile-header">
+    <span id="mobile-title">China · <em>May 2026</em></span>
+    <span id="mobile-city-pill" class="mob-pill-hzh">Hangzhou</span>
   </div>
-  <div id="day-list"></div>
+  <div id="mobile-day-strip"></div>
 </div>
-<div id="main">
-  <div id="content-panel"><div id="day-content"></div></div>
-  <div id="map-panel">
-    <div id="map-header">
-      <span id="map-title">Route map</span>
-      <span id="map-type"></span>
+
+<!-- DESKTOP LAYOUT -->
+<div id="app">
+  <div id="sidebar">
+    <div id="sidebar-header">
+      <h1>China<br><em>May 2026</em></h1>
+      <p>Sydney · Hangzhou · Shanghai · Nanjing</p>
     </div>
-    <div id="map-container"></div>
-    <div id="map-legend"></div>
+    <div id="day-list"></div>
+  </div>
+  <div id="main">
+    <div id="content-panel">
+
+      <!-- MOBILE ONLY: inline collapsible map -->
+      <div id="mobile-map-wrap">
+        <button id="map-toggle-btn" onclick="toggleMobileMap()">
+          <span id="map-toggle-label">🗺 Route map</span>
+          <span id="map-toggle-arrow">▼</span>
+        </button>
+        <div id="mobile-map-inner">
+          <div id="mobile-map-container"></div>
+          <div id="mobile-map-legend"></div>
+        </div>
+      </div>
+
+      <div id="day-content"></div>
+    </div>
+    <div id="map-panel">
+      <div id="map-header">
+        <span id="map-title">Route map</span>
+        <span id="map-type"></span>
+      </div>
+      <div id="map-container"></div>
+      <div id="map-legend"></div>
+    </div>
   </div>
 </div>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script>
 const COL={hzh:'#1a5c9a',sha:'#1a7a52',njg:'#c47a00',dep:'#4a3580'};
+const PILL_CLASS={hzh:'mob-pill-hzh',sha:'mob-pill-sha',njg:'mob-pill-njg',dep:'mob-pill-dep'};
+const ACTIVE_CLASS={hzh:'active-hzh',sha:'active-sha',njg:'active-njg',dep:'active-dep'};
 
 const DAYS=[
-{id:1,date:"Fri 16 May",city:"hzh",cityLabel:"Hangzhou",phase:"Arrive",title:"Arrival",sub:"Land 23:10 · via Guangzhou",
+{id:1,date:"Fri 16 May",dateShort:"16\nFri",city:"hzh",cityLabel:"Hangzhou",phase:"Arrive",title:"Arrival",sub:"Land 23:10 · via Guangzhou",
 summary:"A long travel day from Sydney via Guangzhou. You'll clear Chinese immigration at Guangzhou Baiyun — your first port of entry — then take the connecting flight to Hangzhou, landing just after 11pm. Expect to reach family around midnight.",
 stats:[{l:"Arrive",v:"23:10 HGH"},{l:"Stay",v:"Family home"},{l:"Pace",v:"Travel day"}],
 mapType:"flight",
@@ -146,7 +243,7 @@ items:[
 {time:"23:10",type:"transport",num:2,title:"Land Hangzhou Xiaoshan (T4)",desc:"Baggage claim, then out to arrivals. Family pickup or Didi — 35–50 min to city centre.",tags:[{c:"transport",t:"HGH Terminal 4"}]},
 {time:"~00:30",type:"food",num:3,title:"Arrive home · late supper",desc:"Family will have food waiting. Eat, decompress, get to bed.",tags:[{c:"food",t:"Late supper at home"}]}]},
 
-{id:2,date:"Sat 17 May",city:"hzh",cityLabel:"Hangzhou",phase:"Family",title:"Suits, friends & West Lake",sub:"Shopping · Longjing · Mal & Rifah",
+{id:2,date:"Sat 17 May",dateShort:"17\nSat",city:"hzh",cityLabel:"Hangzhou",phase:"Family",title:"Suits, friends & West Lake",sub:"Shopping · Longjing · Mal & Rifah",
 summary:"A social first full day. Suit shopping with aunt and grandma in the morning, Longjing tea village after lunch, then catching up with Mal and Rifah at West Lake in the afternoon. Lingyin Temple moves to Day 8.",
 stats:[{l:"Pace",v:"Busy but fun"},{l:"Cost",v:"~¥200+"},{l:"Note",v:"Lingyin on 23 May"}],
 mapType:"city",
@@ -156,10 +253,10 @@ items:[
 {time:"10:00 am",type:"rest",num:1,title:"Suit shopping — with aunt & grandma",desc:"Hangzhou has excellent tailors. Qingchun Road and Wulin Square area if you need a starting point. Flag follow-up fittings before you leave for Shanghai tomorrow.",tags:[{c:"",t:"Allow 2–3 hrs"},{c:"warn",t:"Arrange follow-up before 18th"}]},
 {time:"1:00 pm",type:"food",num:2,title:"Lunch — Zhiweiguan",desc:"Century-old Hangzhou restaurant. Beggar's chicken, dongpo pork, osmanthus cake. Worth booking ahead on Saturdays.",tags:[{c:"food",t:"Beggar's chicken"},{c:"food",t:"Dongpo pork"}]},
 {time:"2:30 pm",type:"rest",num:3,title:"Longjing tea village",desc:"Dragon Well tea at its best in May — spring harvest still on. Buy direct from a grower, watch the pan-frying, have a cup. Keep to 90 min to be back for 4pm.",tags:[{c:"food",t:"Buy 50g to take home"},{c:"transport",t:"~30 min from city"}]},
-{time:"4:00 pm",type:"night",num:4,title:"Meet Mal & Rifah",desc:"Two hours with Mal and Rifah. West Lake waterfront is an easy, relaxed spot — walk the Bai Causeway, grab drinks at one of the lakeside cafés.",tags:[{c:"night",t:"West Lake cafés nearby"},{c:"",t:"Until 6pm"}]},
+{time:"4:00 pm",type:"night",num:4,title:"Meet Mal & Rifah",desc:"Two hours at West Lake waterfront. Walk the Bai Causeway, grab drinks at one of the lakeside cafés.",tags:[{c:"night",t:"West Lake cafés nearby"},{c:"",t:"Until 6pm"}]},
 {time:"6:30 pm",type:"food",num:5,title:"Family dinner",desc:"Last meal before your solo leg. West Lake vinegar fish is the one to order.",tags:[{c:"food",t:"West Lake vinegar fish"}]}]},
 
-{id:3,date:"Sun 18 May",city:"sha",cityLabel:"Shanghai",phase:"Solo",title:"Arrive Shanghai",sub:"The Bund · Yu Garden · rooftop",
+{id:3,date:"Sun 18 May",dateShort:"18\nSun",city:"sha",cityLabel:"Shanghai",phase:"Solo",title:"Arrive Shanghai",sub:"The Bund · Yu Garden · rooftop",
 summary:"Solo leg begins. An hour on the G-train and you're in a completely different world. Spend the afternoon on the Bund and in the Old City, then watch Pudong light up from a rooftop bar.",
 stats:[{l:"Train",v:"Hangzhou E → Shanghai"},{l:"Cost",v:"¥73–80"},{l:"Solo",v:"Begins today"}],
 mapType:"intercity",
@@ -168,89 +265,89 @@ items:[
 {time:"8:30 am",type:"transport",num:1,title:"G-train from Hangzhou East",desc:"Trains every 20–30 min. Book on 12306 the night before. ~58 min, smooth and fast.",tags:[{c:"transport",t:"G-train ~58 min"},{c:"transport",t:"¥73–80 2nd class"}]},
 {time:"10:00 am",type:"transport",num:2,title:"Arrive Shanghai Hongqiao",desc:"Metro Line 2 or taxi into the city. Check in — aim for Jing'an, Huangpu or Xuhui.",tags:[{c:"",t:"¥400–800/night"}]},
 {time:"11:30 am",type:"history",num:3,title:"The Bund",desc:"Walk the full 1.5 km waterfront. Colonial buildings one side, Pudong skyline across the river.",tags:[]},
-{time:"1:00 pm",type:"food",title:"Lunch — Lost Heaven (Bund)",desc:"Yunnan-style food in a colonial building right on the Bund. Sit at the bar if solo.",tags:[{c:"food",t:"Yunnan cuisine"},{c:"",t:"Book ahead"}]},
-{time:"3:00 pm",type:"history",num:4,title:"Yu Garden + Old City Bazaar",desc:"16th-century classical garden. Tranquil inside despite the busy bazaar outside. Allow 90 min.",tags:[{c:"",t:"¥40 entry"}]},
-{time:"5:30 pm",type:"rest",title:"Pudong skyline at dusk",desc:"Return to the Bund for sunset — the towers light up dramatically. Best 30-minute photo window of the trip.",tags:[]},
-{time:"8:00 pm",type:"night",num:5,title:"Bar Rouge — Bund 18, Level 7",desc:"One of Shanghai's most famous rooftop bars with sweeping Pudong views. Smart casual.",tags:[{c:"night",t:"Rooftop view"},{c:"",t:"Cocktails ¥90–130"}]}]},
+{time:"1:00 pm",type:"food",title:"Lunch — Lost Heaven (Bund)",desc:"Yunnan-style food in a colonial building. Sit at the bar if solo.",tags:[{c:"food",t:"Yunnan cuisine"},{c:"",t:"Book ahead"}]},
+{time:"3:00 pm",type:"history",num:4,title:"Yu Garden + Old City Bazaar",desc:"16th-century classical garden. Tranquil inside despite the busy bazaar. Allow 90 min.",tags:[{c:"",t:"¥40 entry"}]},
+{time:"5:30 pm",type:"rest",title:"Pudong skyline at dusk",desc:"Return to the Bund for sunset — towers light up dramatically. Best 30-minute photo window.",tags:[]},
+{time:"8:00 pm",type:"night",num:5,title:"Bar Rouge — Bund 18, Level 7",desc:"One of Shanghai's most famous rooftop bars. Sweeping Pudong views, smart casual.",tags:[{c:"night",t:"Rooftop view"},{c:"",t:"Cocktails ¥90–130"}]}]},
 
-{id:4,date:"Mon 19 May",city:"sha",cityLabel:"Shanghai",phase:"Solo",title:"French Concession",sub:"Wukang Rd · Tianzifang · nightlife",
+{id:4,date:"Mon 19 May",dateShort:"19\nMon",city:"sha",cityLabel:"Shanghai",phase:"Solo",title:"French Concession",sub:"Wukang Rd · Tianzifang · nightlife",
 summary:"The best day in Shanghai. Tree-lined boulevards, Art Deco villas, outstanding food, and a late-running nightlife scene. Take it slowly.",
 stats:[{l:"Walk",v:"~10 km"},{l:"Vibe",v:"Urban cool"},{l:"Pace",v:"Relaxed"}],
 mapType:"city",
 locs:[{n:"Farine – brunch",lat:31.215,lng:121.440,num:1},{n:"Wukang Road",lat:31.214,lng:121.442,num:2},{n:"Jia Jia Tang Bao",lat:31.230,lng:121.476,num:3},{n:"Tianzifang",lat:31.208,lng:121.465,num:4},{n:"Xintiandi",lat:31.219,lng:121.473,num:5},{n:"Jesse Restaurant",lat:31.217,lng:121.443,num:6},{n:"Yongkang Road bars",lat:31.213,lng:121.457,num:7}],
 items:[
-{time:"9:00 am",type:"food",num:1,title:"Brunch — Farine (Ferguson Lane)",desc:"Best pastries in the French Concession. Exceptional croissants. Sit in the courtyard.",tags:[{c:"food",t:"Best croissants in Shanghai"}]},
+{time:"9:00 am",type:"food",num:1,title:"Brunch — Farine (Ferguson Lane)",desc:"Best pastries in the French Concession. Exceptional croissants.",tags:[{c:"food",t:"Best croissants in Shanghai"}]},
 {time:"10:30 am",type:"history",num:2,title:"Wukang Road walk",desc:"Most photographed street in Shanghai. Art Deco villas, wisteria-covered bend, galleries in the laneways.",tags:[]},
-{time:"1:00 pm",type:"food",num:3,title:"Lunch — Jia Jia Tang Bao",desc:"Legendary xiaolongbao. Queue moves fast. Pork and crab roe basket — ~¥40.",tags:[{c:"food",t:"Xiaolongbao"},{c:"",t:"Cash only ~¥40/basket"}]},
-{time:"2:30 pm",type:"history",num:4,title:"Tianzifang",desc:"1930s shikumen laneways turned galleries and cafés. Find a terrace, order a cold drink, people-watch.",tags:[]},
-{time:"5:00 pm",type:"rest",num:5,title:"Xintiandi + K11 Musea",desc:"Polished shikumen neighbourhood with upscale bars. K11 Musea art-mall is worth a walk through.",tags:[]},
-{time:"7:30 pm",type:"food",num:6,title:"Dinner — Jesse Restaurant",desc:"Old-school Shanghai home cooking. Red-braised pork, smoked fish. No English menu — point at neighbours' food.",tags:[{c:"food",t:"Shanghai home cooking"}]},
+{time:"1:00 pm",type:"food",num:3,title:"Lunch — Jia Jia Tang Bao",desc:"Legendary xiaolongbao. Queue moves fast. Pork and crab roe basket ~¥40.",tags:[{c:"food",t:"Xiaolongbao"},{c:"",t:"Cash only ~¥40/basket"}]},
+{time:"2:30 pm",type:"history",num:4,title:"Tianzifang",desc:"1930s shikumen laneways turned galleries and cafés.",tags:[]},
+{time:"5:00 pm",type:"rest",num:5,title:"Xintiandi + K11 Musea",desc:"Polished shikumen with upscale bars. K11 Musea art-mall worth a walk through.",tags:[]},
+{time:"7:30 pm",type:"food",num:6,title:"Dinner — Jesse Restaurant",desc:"Old-school Shanghai home cooking. Red-braised pork, smoked fish. Point at neighbours' food.",tags:[{c:"food",t:"Shanghai home cooking"}]},
 {time:"9:00 pm",type:"night",num:7,title:"Yongkang Road bar crawl",desc:"Short street of cocktail bars and craft beer spots. Busy from 9 pm, local crowd Mon–Wed.",tags:[{c:"night",t:"Busy from 9 pm"}]}]},
 
-{id:5,date:"Tue 20 May",city:"njg",cityLabel:"Nanjing",phase:"Solo",title:"Arrive Nanjing",sub:"Fuzimiao · Qinhuai River · duck",
-summary:"Morning at leisure in Shanghai, then a G-train hop to Nanjing. A historically richer city, far less visited by tourists. Your first evening in the ancient Confucius Temple precinct sets the tone perfectly.",
+{id:5,date:"Tue 20 May",dateShort:"20\nTue",city:"njg",cityLabel:"Nanjing",phase:"Solo",title:"Arrive Nanjing",sub:"Fuzimiao · Qinhuai River · duck",
+summary:"Morning at leisure in Shanghai, then a G-train hop to Nanjing. A historically richer city, far less visited by tourists. Your first evening in the Confucius Temple precinct sets the tone perfectly.",
 stats:[{l:"Train",v:"Shanghai → Nanjing ~1.5 hr"},{l:"Cost",v:"~¥134"},{l:"Check-in",v:"Afternoon"}],
 mapType:"intercity",
 locs:[{n:"Shanghai Hongqiao Station",lat:31.195,lng:121.327,num:1},{n:"Nanjing South Station",lat:31.976,lng:118.796,num:2},{n:"Confucius Temple (Fuzimiao)",lat:32.019,lng:118.789,num:3},{n:"Qinhuai River night walk",lat:32.018,lng:118.790,num:4}],
 items:[
-{time:"9:00 am",type:"rest",title:"Morning at leisure in Shanghai",desc:"Coffee in the French Concession. Optional: Jing'an Temple or last wander down Anfu Road.",tags:[]},
+{time:"9:00 am",type:"rest",title:"Morning at leisure in Shanghai",desc:"Coffee in the French Concession. Optional: Jing'an Temple or a last wander down Anfu Road.",tags:[]},
 {time:"11:30 am",type:"food",title:"Quick lunch — Yang's Braised Pork Rice",desc:"Huanghe Road. Fast, cheap, delicious.",tags:[{c:"food",t:"Braised pork rice ¥20"}]},
 {time:"1:30 pm",type:"transport",num:1,title:"G-train to Nanjing South",desc:"~1 hr 20 min. Very frequent. Take Metro Line 1 or 3 into the city on arrival.",tags:[{c:"transport",t:"~¥134 2nd class"}]},
 {time:"4:00 pm",type:"rest",num:2,title:"Arrive & check in",desc:"Stay near Fuzimiao or Xinjiekou. Budget ¥350–700/night.",tags:[{c:"",t:"Near Fuzimiao recommended"}]},
-{time:"5:30 pm",type:"history",num:3,title:"Confucius Temple (Fuzimiao)",desc:"Ancient temple complex and pedestrian precinct — best first-evening walk in Nanjing. Atmospheric, historic, full of food stalls.",tags:[]},
+{time:"5:30 pm",type:"history",num:3,title:"Confucius Temple (Fuzimiao)",desc:"Ancient temple complex and pedestrian precinct — best first-evening walk in Nanjing.",tags:[]},
 {time:"7:00 pm",type:"food",title:"Dinner — Qinhuai snack street",desc:"Duck blood soup, salt-baked duck, pan-fried Nanjing dumplings. Walk and eat.",tags:[{c:"food",t:"Duck blood soup"},{c:"food",t:"Salt-baked duck"}]},
-{time:"8:30 pm",type:"night",num:4,title:"Qinhuai River night walk",desc:"Canal lit with red lanterns — one of the most beautiful sights in China. Walk both banks.",tags:[{c:"night",t:"Most beautiful at night"}]}]},
+{time:"8:30 pm",type:"night",num:4,title:"Qinhuai River night walk",desc:"Canal lit with red lanterns — one of the most beautiful sights in China.",tags:[{c:"night",t:"Most beautiful at night"}]}]},
 
-{id:6,date:"Wed 21 May",city:"njg",cityLabel:"Nanjing",phase:"Solo",title:"Purple Mountain",sub:"Ming tombs · Memorial · duck dinner",
+{id:6,date:"Wed 21 May",dateShort:"21\nWed",city:"njg",cityLabel:"Nanjing",phase:"Solo",title:"Purple Mountain",sub:"Ming tombs · Memorial · duck dinner",
 summary:"The most historically dense day of the trip. Purple Mountain holds two of China's great monuments. The afternoon at the Massacre Memorial is sobering and important — allow proper time.",
 stats:[{l:"Walk",v:"~12 km"},{l:"Note",v:"Emotionally full day"},{l:"Pace",v:"Measured"}],
 mapType:"city",
 locs:[{n:"Ming Xiaoling Mausoleum",lat:32.062,lng:118.845,num:1},{n:"Sun Yat-sen Mausoleum",lat:32.065,lng:118.849,num:2},{n:"Massacre Memorial Hall",lat:32.033,lng:118.748,num:3},{n:"Duck dinner – city centre",lat:32.052,lng:118.796,num:4}],
 items:[
-{time:"8:00 am",type:"history",num:1,title:"Ming Xiaoling Mausoleum",desc:"Burial site of the Hongwu Emperor. The Sacred Way — stone animal statues — is one of the great processional paths in Asia. Arrive early for quiet.",tags:[{c:"",t:"¥70 entry"},{c:"",t:"Arrive early"}]},
-{time:"10:30 am",type:"history",num:2,title:"Sun Yat-sen Mausoleum",desc:"392 steps up Purple Mountain. The view from the top over Nanjing is outstanding.",tags:[{c:"",t:"¥80 entry"},{c:"transport",t:"~20 min from Xiaoling"}]},
+{time:"8:00 am",type:"history",num:1,title:"Ming Xiaoling Mausoleum",desc:"The Sacred Way — stone animal statues — is one of the great processional paths in Asia. Arrive early.",tags:[{c:"",t:"¥70 entry"},{c:"",t:"Arrive early"}]},
+{time:"10:30 am",type:"history",num:2,title:"Sun Yat-sen Mausoleum",desc:"392 steps up Purple Mountain. Outstanding view from the top.",tags:[{c:"",t:"¥80 entry"},{c:"transport",t:"~20 min from Xiaoling"}]},
 {time:"1:00 pm",type:"food",title:"Lunch near Purple Mountain",desc:"Pan-fried beef noodles (牛肉锅贴) at the base of the mountain.",tags:[{c:"food",t:"Pan-fried beef noodles"}]},
-{time:"3:00 pm",type:"history",num:3,title:"Nanjing Massacre Memorial Hall",desc:"Documents the 1937 massacre. One of the most important historical sites in China. Allow 2–2.5 hours. Photography restricted inside.",tags:[{c:"warn",t:"Free entry, bring passport"},{c:"warn",t:"Allow 2.5 hrs"}]},
-{time:"6:00 pm",type:"rest",title:"Rest at hotel",desc:"A heavy day — decompress before going out.",tags:[]},
+{time:"3:00 pm",type:"history",num:3,title:"Nanjing Massacre Memorial Hall",desc:"One of the most important historical sites in China. Allow 2–2.5 hours. Photography restricted inside.",tags:[{c:"warn",t:"Free entry, bring passport"},{c:"warn",t:"Allow 2.5 hrs"}]},
+{time:"6:00 pm",type:"rest",title:"Rest at hotel",desc:"A heavy day — decompress before going out again.",tags:[]},
 {time:"8:00 pm",type:"food",num:4,title:"Dinner — local duck restaurant",desc:"Half a salt-baked duck, edamame, cold tofu with pickles, a Jinling beer.",tags:[{c:"food",t:"Salt-baked duck"},{c:"food",t:"Jinling beer"}]}]},
 
-{id:7,date:"Thu 22 May",city:"njg",cityLabel:"Nanjing",phase:"Solo",title:"City Wall → Hangzhou",sub:"Ancient walls · Xuanwu Lake · home",
+{id:7,date:"Thu 22 May",dateShort:"22\nThu",city:"njg",cityLabel:"Nanjing",phase:"Solo",title:"City Wall → Hangzhou",sub:"Ancient walls · Xuanwu Lake · home",
 summary:"A gentler morning on Nanjing's extraordinary Ming-dynasty city wall before the train back to Hangzhou and your family. Solo leg complete.",
 stats:[{l:"Train",v:"Nanjing → Hangzhou ~2 hr"},{l:"Cost",v:"~¥134"},{l:"Arrive",v:"Afternoon"}],
 mapType:"intercity",
 locs:[{n:"Xuanwu Gate – City Wall",lat:32.075,lng:118.790,num:1},{n:"Xuanwu Lake Park",lat:32.076,lng:118.794,num:2},{n:"Nanjing South Station",lat:31.976,lng:118.796,num:3},{n:"Hangzhou East Station",lat:30.293,lng:120.217,num:4}],
 items:[
-{time:"8:30 am",type:"history",num:1,title:"Ancient City Wall — Xuanwu section",desc:"The longest city wall in the world at 35 km. Views over Xuanwu Lake and the old gates. Access from Zhongyang Gate.",tags:[{c:"",t:"¥35 entry"},{c:"",t:"~1.5 hrs"}]},
-{time:"10:00 am",type:"rest",num:2,title:"Xuanwu Lake Park",desc:"City lake enclosed by the old walls, causeways to small islands. Free entry.",tags:[]},
+{time:"8:30 am",type:"history",num:1,title:"Ancient City Wall — Xuanwu section",desc:"The longest city wall in the world at 35 km. Views over Xuanwu Lake and the old gates.",tags:[{c:"",t:"¥35 entry"},{c:"",t:"~1.5 hrs"}]},
+{time:"10:00 am",type:"rest",num:2,title:"Xuanwu Lake Park",desc:"City lake enclosed by the old walls. Free entry.",tags:[]},
 {time:"12:00 pm",type:"food",title:"Last Nanjing lunch — duck blood soup",desc:"One more bowl before you leave.",tags:[{c:"food",t:"Final duck soup"}]},
 {time:"1:30 pm",type:"transport",num:3,title:"G-train back to Hangzhou",desc:"Nanjing South → Hangzhou East. ~2 hrs.",tags:[{c:"transport",t:"~¥134 2nd class"}]},
 {time:"4:00 pm",type:"rest",num:4,title:"Reunite with family",desc:"Solo leg complete. Three cities, seven days.",tags:[]},
 {time:"7:30 pm",type:"food",title:"Family dinner",desc:"Bring back Nanjing salt-baked duck and Jinling cloud cakes (云片糕) as gifts.",tags:[{c:"food",t:"Bring duck as souvenir"}]}]},
 
-{id:8,date:"Fri 23 May",city:"hzh",cityLabel:"Hangzhou",phase:"Family",title:"Lingyin, tea & wetlands",sub:"Temples · Tea Museum · Xixi",
+{id:8,date:"Fri 23 May",dateShort:"23\nFri",city:"hzh",cityLabel:"Hangzhou",phase:"Family",title:"Lingyin, tea & wetlands",sub:"Temples · Tea Museum · Xixi",
 summary:"Lingyin Temple moves here from Day 2 — more time to appreciate it properly. National Tea Museum in the afternoon, then Xixi Wetlands for a completely different landscape.",
 stats:[{l:"Pace",v:"Relaxed"},{l:"Cost",v:"~¥165"},{l:"Walk",v:"~7 km"}],
 mapType:"city",
 locs:[{n:"Lingyin Temple",lat:30.242,lng:120.101,num:1},{n:"National Tea Museum",lat:30.220,lng:120.104,num:2},{n:"Xixi Wetlands",lat:30.267,lng:120.053,num:3}],
 items:[
 {time:"9:00 am",type:"history",num:1,title:"Lingyin Temple",desc:"One of China's most important Buddhist temples. The Feilai Feng cliff carvings — hundreds of rock-cut Buddhas — are the highlight. Allow 2 hours.",tags:[{c:"",t:"¥45 entry"},{c:"",t:"Allow 2 hrs"}]},
-{time:"11:30 am",type:"food",title:"Lunch near Lingyin",desc:"Several good Hangzhou restaurants in the area. Ask family for their pick.",tags:[]},
+{time:"11:30 am",type:"food",title:"Lunch near Lingyin",desc:"Several good Hangzhou restaurants in the area.",tags:[]},
 {time:"1:30 pm",type:"history",num:2,title:"National Tea Museum",desc:"One of the best tea museums in the world. Free entry. Beautiful gardens and tasting sessions.",tags:[{c:"",t:"Free entry"},{c:"food",t:"Tea tasting included"}]},
-{time:"4:00 pm",type:"rest",num:3,title:"Xixi Wetlands National Park",desc:"Urban wetland with boat rides through reed marshes and ancient fishing villages. Serene and photogenic.",tags:[{c:"",t:"¥80 park + ¥40 boat"}]},
+{time:"4:00 pm",type:"rest",num:3,title:"Xixi Wetlands National Park",desc:"Urban wetland with boat rides through reed marshes and ancient fishing villages.",tags:[{c:"",t:"¥80 park + ¥40 boat"}]},
 {time:"7:00 pm",type:"food",title:"Family dinner",desc:"Relaxed evening at home.",tags:[]}]},
 
-{id:9,date:"Sat 24 May",city:"hzh",cityLabel:"Wenzhou",phase:"Family",title:"Wedding in Wenzhou",sub:"G-train · ceremony · banquet · overnight",
+{id:9,date:"Sat 24 May",dateShort:"24\nSat",city:"hzh",cityLabel:"Wenzhou",phase:"Family",title:"Wedding in Wenzhou",sub:"G-train · ceremony · overnight",
 summary:"A trip to Wenzhou for a wedding, with an overnight stay. About 2 hours from Hangzhou by G-train. You'll head back to Hangzhou the morning of the 25th, leaving the afternoon free before your flight.",
 stats:[{l:"Train",v:"Hangzhou → Wenzhou ~2 hrs"},{l:"Cost",v:"~¥150 each way"},{l:"Stay",v:"Overnight Wenzhou"}],
 mapType:"intercity",
 locs:[{n:"Hangzhou East Station",lat:30.293,lng:120.217,num:1},{n:"Wenzhou South Station",lat:27.957,lng:120.654,num:2},{n:"Wenzhou city centre – hotel",lat:28.000,lng:120.672,num:3}],
 items:[
-{time:"Morning",type:"transport",num:1,title:"G-train to Wenzhou",desc:"Hangzhou East → Wenzhou South. ~2 hrs (~¥150 2nd class). Book on 12306 ahead of time. Depart early enough to check in and freshen up before the ceremony.",tags:[{c:"transport",t:"~2 hrs · ¥150 2nd class"},{c:"transport",t:"Book ahead on 12306"}]},
-{time:"Arrival",type:"rest",num:2,title:"Check into hotel — Wenzhou",desc:"Drop bags, freshen up. Book somewhere central or near the wedding venue. Don't leave this too late — good hotels in Wenzhou fill up on weekends.",tags:[{c:"warn",t:"Book hotel in advance"}]},
-{time:"Wedding",type:"night",num:3,title:"Wedding ceremony & banquet",desc:"Chinese wedding banquets are multi-course, long, and celebratory — expect a lively evening with lots of toasting. Dress smart. Go with it.",tags:[{c:"",t:"Dress smart"},{c:"food",t:"Multi-course banquet"}]},
-{time:"Night",type:"rest",title:"Overnight in Wenzhou",desc:"Stay at your hotel. No rush — morning train back to Hangzhou tomorrow. You'll be back in Hangzhou by late morning with the afternoon free before your 18:35 flight.",tags:[{c:"",t:"Relaxed overnight"}]}]},
+{time:"Morning",type:"transport",num:1,title:"G-train to Wenzhou",desc:"Hangzhou East → Wenzhou South. ~2 hrs (~¥150 2nd class). Book on 12306 ahead of time.",tags:[{c:"transport",t:"~2 hrs · ¥150 2nd class"},{c:"transport",t:"Book ahead on 12306"}]},
+{time:"Arrival",type:"rest",num:2,title:"Check into hotel — Wenzhou",desc:"Drop bags, freshen up. Book somewhere central or near the wedding venue. Don't leave this too late — good hotels fill up on weekends.",tags:[{c:"warn",t:"Book hotel in advance"}]},
+{time:"Wedding",type:"night",num:3,title:"Wedding ceremony & banquet",desc:"Multi-course, long, and celebratory — expect a lively evening with lots of toasting. Dress smart.",tags:[{c:"",t:"Dress smart"},{c:"food",t:"Multi-course banquet"}]},
+{time:"Night",type:"rest",title:"Overnight in Wenzhou",desc:"Stay at your hotel. Morning train back to Hangzhou tomorrow — back in time for a farewell lunch before your 18:35 flight.",tags:[{c:"",t:"Relaxed overnight"}]}]},
 
-{id:10,date:"Sun 25 May",city:"dep",cityLabel:"Departure",phase:"Depart",title:"Wenzhou → Hangzhou → fly out",sub:"Morning train · farewell lunch · CZ3502 18:35",
+{id:10,date:"Sun 25 May",dateShort:"25\nSun",city:"dep",cityLabel:"Departure",phase:"Depart",title:"Wenzhou → Hangzhou → fly out",sub:"Morning train · farewell lunch · CZ3502 18:35",
 summary:"Morning G-train back from Wenzhou to Hangzhou, arriving mid-morning. A final family lunch, then a relaxed afternoon before heading to the airport for your 18:35 departure to Guangzhou.",
 stats:[{l:"Train",v:"Wenzhou → Hangzhou AM"},{l:"Depart HGH",v:"18:35 · CZ3502"},{l:"Overnight",v:"Guangzhou"}],
 mapType:"flight",
@@ -258,97 +355,92 @@ locs:[{n:"Wenzhou South Station",lat:27.957,lng:120.654,num:1},{n:"Hangzhou East
 flights:[{label:"CZ3502 · Domestic",type:"dom",from:"HGH",fromCity:"Hangzhou Xiaoshan",dep:"18:35",depT:"Terminal 4",to:"CAN",toCity:"Guangzhou Baiyun",arr:"~20:50",arrT:"Terminal 2",dur:"~2 hrs 15 min · A330-300",note:"On-time rating 4.6/5 · Leave for airport by 16:30"}],
 overnight:{title:"Overnight in Guangzhou · ~11 hrs",desc:"CZ3502 arrives ~20:50 and CZ301 departs 08:00 the next morning. Recommend the Novotel Guangzhou Baiyun Airport — connected to T2 by walkway. Book ahead. Be back at T2 check-in by 06:00 (closes 07:15)."},
 items:[
-{time:"Morning",type:"transport",num:1,title:"G-train Wenzhou → Hangzhou",desc:"Wenzhou South → Hangzhou East. ~2 hrs. Aim for a train departing 7–8am to be back in Hangzhou by 10am. Book the return ticket before the wedding.",tags:[{c:"transport",t:"~2 hrs · ~¥150"},{c:"warn",t:"Book return ticket in advance"}]},
-{time:"~10:00 am",type:"rest",num:2,title:"Arrive Hangzhou — back with family",desc:"Drop bags, freshen up. You've got a good chunk of the morning before needing to think about the airport.",tags:[]},
-{time:"11:00 am",type:"rest",num:3,title:"Final West Lake walk",desc:"Su Causeway — longer and quieter than Bai Causeway, mist still on the water in May mornings. One last look.",tags:[]},
-{time:"12:30 pm",type:"food",title:"Final family lunch",desc:"Let the family choose. Long, slow, lots of dishes, probably some toasting. This is the one.",tags:[]},
-{time:"2:30 pm",type:"rest",title:"Pack up · sort gifts",desc:"Longjing tea in sealed bags is fine through Australian customs. Confirm Didi to airport.",tags:[{c:"",t:"Sealed tea: OK for customs"},{c:"transport",t:"Didi to airport ~40 min"}]},
+{time:"Morning",type:"transport",num:1,title:"G-train Wenzhou → Hangzhou",desc:"Aim for a train departing 7–8am to be back in Hangzhou by 10am. Book the return ticket before the wedding.",tags:[{c:"transport",t:"~2 hrs · ~¥150"},{c:"warn",t:"Book return ticket in advance"}]},
+{time:"~10:00 am",type:"rest",num:2,title:"Arrive Hangzhou — back with family",desc:"Drop bags, freshen up. Good chunk of morning before needing to think about the airport.",tags:[]},
+{time:"11:00 am",type:"rest",num:3,title:"Final West Lake walk",desc:"Su Causeway — longer and quieter than Bai Causeway, mist on the water in May mornings.",tags:[]},
+{time:"12:30 pm",type:"food",title:"Final family lunch",desc:"Let the family choose. Long, slow, lots of dishes, some toasting. This is the one.",tags:[]},
+{time:"2:30 pm",type:"rest",title:"Pack up · sort gifts",desc:"Longjing tea in sealed bags is fine through Australian customs.",tags:[{c:"",t:"Sealed tea: OK for customs"},{c:"transport",t:"Didi to airport ~40 min"}]},
 {time:"4:30 pm",type:"transport",num:4,title:"Leave for Hangzhou Xiaoshan Airport",desc:"Allow 40–50 min. Check in at Terminal 4.",tags:[{c:"transport",t:"HGH Terminal 4"}]},
 {time:"18:35",type:"transport",title:"CZ3502 departs Hangzhou",desc:"~2 hrs 15 min to Guangzhou Baiyun T2. Arrive ~20:50.",tags:[{c:"transport",t:"CAN T2 on arrival"}]},
 {time:"~21:30",type:"rest",num:5,title:"Check in — Novotel Guangzhou Airport",desc:"Connected to T2 by walkway. Sleep. Early start tomorrow.",tags:[{c:"",t:"Novotel linked to T2"},{c:"warn",t:"Set alarm 5:30 am"}]}]},
 
-{id:11,date:"Mon 26 May",city:"dep",cityLabel:"Departure",phase:"Fly home",title:"Guangzhou → Sydney",sub:"CZ301 · home by evening",
+{id:11,date:"Mon 26 May",dateShort:"26\nMon",city:"dep",cityLabel:"Departure",phase:"Fly home",title:"Guangzhou → Sydney",sub:"CZ301 · home by evening",
 summary:"An early start for the long flight home. You'll land back in Sydney by early evening after a 9.5-hour flight.",
 stats:[{l:"Departs",v:"08:00 · CZ301"},{l:"Arrives SYD",v:"19:25 AEST"},{l:"At T2",v:"By 06:00"}],
 mapType:"flight",
 locs:[{n:"Guangzhou Baiyun Airport",lat:23.393,lng:113.299,num:1},{n:"Sydney Airport (T1)",lat:-33.940,lng:151.175,num:2}],
-flights:[{label:"CZ301 · International",type:"intl",from:"CAN",fromCity:"Guangzhou Baiyun",dep:"08:00",depT:"Terminal 2 · Gate A154",to:"SYD",toCity:"Sydney Kingsford Smith",arr:"19:25 AEST",arrT:"Terminal 1 · Gate 24",dur:"~9 hrs 25 min · Airbus A350-900",note:"Check-in closes 07:15 · Be at T2 by 06:00 · 88% on-time performance"}],
+flights:[{label:"CZ301 · International",type:"intl",from:"CAN",fromCity:"Guangzhou Baiyun",dep:"08:00",depT:"Terminal 2 · Gate A154",to:"SYD",toCity:"Sydney Kingsford Smith",arr:"19:25 AEST",arrT:"Terminal 1 · Gate 24",dur:"~9 hrs 25 min · Airbus A350-900",note:"Check-in closes 07:15 · Be at T2 by 06:00 · 88% on-time"}],
 items:[
 {time:"05:30 am",type:"transport",num:1,title:"Wake up · head to Terminal 2",desc:"5 min walk from Novotel. Check-in closes 07:15 — don't leave it late.",tags:[{c:"warn",t:"Check-in closes 07:15"}]},
 {time:"08:00",type:"transport",title:"CZ301 departs Guangzhou",desc:"Airbus A350-900. Non-stop ~9 hrs 25 min to Sydney.",tags:[{c:"transport",t:"Non-stop · A350-900"}]},
 {time:"19:25 AEST",type:"rest",num:2,title:"Land Sydney Kingsford Smith",desc:"Terminal 1. ABF, biosecurity, baggage. Taxis, Uber and Airport Link train from the terminal.",tags:[{c:"",t:"T1 International SYD"},{c:"",t:"Airport Link train direct"}]}]}
 ];
 
-// ── MAP ────────────────────────────────────────────────────────────────
-let MAP = null;
+// ── STATE ──────────────────────────────────────────────────────────────
+let cur=0, mapOpen=true;
+let DMAP=null, MMAP=null; // desktop map, mobile map
 
-function buildMap(day) {
-  const el = document.getElementById('map-container');
-  if (MAP) { MAP.remove(); MAP = null; }
-  MAP = L.map(el, {zoomControl:true});
+const isMobile=()=>window.innerWidth<768;
+
+// ── MAP ────────────────────────────────────────────────────────────────
+function drawMap(container, day, existingMap) {
+  if(existingMap){existingMap.remove();}
+  const col=COL[day.city], locs=day.locs||[];
+  if(!locs.length) return null;
+  const m=L.map(container,{zoomControl:true,scrollWheelZoom:!isMobile()});
   L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{
     attribution:'© <a href="https://openstreetmap.org">OSM</a> © <a href="https://carto.com">CARTO</a>',
-    subdomains:'abcd', maxZoom:18
-  }).addTo(MAP);
-
-  const col = COL[day.city];
-  const locs = day.locs || [];
-  if (!locs.length) return;
-  const pts = locs.map(l=>[l.lat,l.lng]);
-
-  // Route line
-  if (day.mapType==='flight') {
-    // Curved arc between each pair
-    for (let i=0;i<pts.length-1;i++) {
-      const a=pts[i], b=pts[i+1];
-      const arc=[];
-      for (let s=0;s<=24;s++) {
-        const t=s/24;
-        // slight bulge eastward for visual arc
-        const lat=a[0]+(b[0]-a[0])*t;
-        const lng=a[1]+(b[1]-a[1])*t + Math.sin(Math.PI*t)*2;
-        arc.push([lat,lng]);
-      }
-      L.polyline(arc,{color:col,weight:2,opacity:.65,dashArray:'7 5'}).addTo(MAP);
+    subdomains:'abcd',maxZoom:18
+  }).addTo(m);
+  const pts=locs.map(l=>[l.lat,l.lng]);
+  if(day.mapType==='flight'){
+    for(let i=0;i<pts.length-1;i++){
+      const a=pts[i],b=pts[i+1],arc=[];
+      for(let s=0;s<=24;s++){const t=s/24;arc.push([a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t+Math.sin(Math.PI*t)*2]);}
+      L.polyline(arc,{color:col,weight:2,opacity:.65,dashArray:'7 5'}).addTo(m);
     }
-  } else if (day.mapType==='intercity') {
-    L.polyline(pts,{color:col,weight:2.5,opacity:.7,dashArray:'9 5'}).addTo(MAP);
+  } else if(day.mapType==='intercity'){
+    L.polyline(pts,{color:col,weight:2.5,opacity:.7,dashArray:'9 5'}).addTo(m);
   } else {
-    L.polyline(pts,{color:col,weight:3,opacity:.75}).addTo(MAP);
+    L.polyline(pts,{color:col,weight:3,opacity:.75}).addTo(m);
   }
-
-  // Markers
   locs.forEach(loc=>{
-    const ic=L.divIcon({
-      className:'',
-      html:`<div class="loc-marker" style="background:${col}">${loc.num}</div>`,
-      iconSize:[22,22],iconAnchor:[11,11]
-    });
-    L.marker([loc.lat,loc.lng],{icon:ic})
+    L.marker([loc.lat,loc.lng],{icon:L.divIcon({className:'',html:`<div class="loc-marker" style="background:${col}">${loc.num}</div>`,iconSize:[22,22],iconAnchor:[11,11]})})
       .bindPopup(`<b style="font-size:12px;font-family:'DM Sans',sans-serif">${loc.n}</b>`,{maxWidth:180})
-      .addTo(MAP);
+      .addTo(m);
   });
-
-  MAP.fitBounds(L.latLngBounds(pts),{padding:[28,28]});
-
-  // Legend
-  document.getElementById('map-legend').innerHTML =
-    locs.map(l=>`<div style="display:flex;align-items:center;gap:7px;margin-bottom:3px">
-      <div style="width:15px;height:15px;min-width:15px;border-radius:50%;background:${col};display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:#fff">${l.num}</div>
-      <span style="font-size:11px;color:var(--text2)">${l.n}</span></div>`).join('');
-
-  const typeLabel={city:'Walking route',intercity:'Train route',flight:'Flight path'};
-  document.getElementById('map-type').textContent = typeLabel[day.mapType]||'';
+  m.fitBounds(L.latLngBounds(pts),{padding:[24,24]});
+  return m;
 }
 
-// ── SIDEBAR & CONTENT ─────────────────────────────────────────────────
-const CC={hzh:'c-hzh',sha:'c-sha',njg:'c-njg',dep:'c-dep'};
-const CT={hzh:'c-hzh-t',sha:'c-sha-t',njg:'c-njg-t',dep:'c-dep-t'};
-let cur=0;
+function buildMaps(day){
+  const legendHtml=day.locs.map(l=>`<div style="display:flex;align-items:center;gap:7px;margin-bottom:3px"><div style="width:15px;height:15px;min-width:15px;border-radius:50%;background:${COL[day.city]};display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:#fff">${l.num}</div><span>${l.n}</span></div>`).join('');
+  const typeLabel={city:'Walking route',intercity:'Train route',flight:'Flight path'};
+  // Desktop map
+  DMAP=drawMap(document.getElementById('map-container'),day,DMAP);
+  document.getElementById('map-legend').innerHTML=legendHtml;
+  document.getElementById('map-type').textContent=typeLabel[day.mapType]||'';
+  // Mobile map
+  MMAP=drawMap(document.getElementById('mobile-map-container'),day,MMAP);
+  document.getElementById('mobile-map-legend').innerHTML=legendHtml;
+  document.getElementById('map-toggle-label').textContent='🗺 '+day.title+' route';
+}
 
+// ── MAP TOGGLE (mobile) ───────────────────────────────────────────────
+function toggleMobileMap(){
+  mapOpen=!mapOpen;
+  const inner=document.getElementById('mobile-map-inner');
+  const arrow=document.getElementById('map-toggle-arrow');
+  inner.style.height=mapOpen?(document.getElementById('mobile-map-container').offsetHeight+document.getElementById('mobile-map-legend').offsetHeight+10)+'px':'0px';
+  arrow.textContent=mapOpen?'▼':'▶';
+  if(mapOpen && MMAP){setTimeout(()=>MMAP.invalidateSize(),260);}
+}
+
+// ── SIDEBAR ────────────────────────────────────────────────────────────
 function buildSidebar(){
+  // Desktop
   document.getElementById('day-list').innerHTML=DAYS.map((d,i)=>
-    `<div class="day-item ${CC[d.city]} ${i===cur?'active':''}" onclick="go(${i})">
+    `<div class="day-item ${i===cur?'active':''} c-${d.city}" onclick="go(${i})">
       <div class="day-accent"></div>
       <div class="day-inner">
         <div class="day-meta"><span class="day-num">${d.date}</span><span class="day-pill">${d.cityLabel}</span></div>
@@ -356,7 +448,29 @@ function buildSidebar(){
         <div class="day-sub">${d.sub}</div>
       </div>
     </div>`).join('');
+  // Mobile strip
+  const strip=document.getElementById('mobile-day-strip');
+  strip.innerHTML=DAYS.map((d,i)=>{
+    const parts=d.dateShort.split('\n');
+    const isActive=i===cur;
+    return`<button class="mob-day-btn ${isActive?ACTIVE_CLASS[d.city]:''}" onclick="go(${i})">
+      <div class="md">${parts[0]}</div>
+      <div class="mw">${parts[1]}</div>
+      <div class="color-bar" style="background:${COL[d.city]};opacity:${isActive?1:0.3}"></div>
+    </button>`;
+  }).join('');
+  // Scroll active day button into view
+  const btns=strip.querySelectorAll('.mob-day-btn');
+  if(btns[cur]){btns[cur].scrollIntoView({behavior:'smooth',inline:'center',block:'nearest'});}
+  // Mobile header pill
+  const d=DAYS[cur];
+  const pill=document.getElementById('mobile-city-pill');
+  pill.textContent=d.cityLabel;
+  pill.className='mob-pill-'+d.city;
 }
+
+// ── RENDER DAY ─────────────────────────────────────────────────────────
+const CT={hzh:'c-hzh-t',sha:'c-sha-t',njg:'c-njg-t',dep:'c-dep-t'};
 
 function rf(f){
   return`<div class="flight-card">
@@ -373,9 +487,7 @@ function rf(f){
 function ri(item,city){
   const icons={transport:'✈',food:'◉',history:'▲',night:'◐',alert:'!',rest:'○'};
   const tags=(item.tags||[]).map(t=>`<span class="tag ${t.c}">${t.t}</span>`).join('');
-  const dot=item.num
-    ?`<div class="tl-num ${city}">${item.num}</div>`
-    :`<div class="tl-dot ${item.type}">${icons[item.type]||'○'}</div>`;
+  const dot=item.num?`<div class="tl-num ${city}">${item.num}</div>`:`<div class="tl-dot ${item.type}">${icons[item.type]||'○'}</div>`;
   return`<div class="tl-item">${dot}
     <div class="tl-time">${item.time}</div>
     <div class="tl-title">${item.title}</div>
@@ -394,12 +506,44 @@ function renderDay(){
   if(d.overnight){h+=`<div class="overnight"><h4>🌙 ${d.overnight.title}</h4><p>${d.overnight.desc}</p></div>`;}
   if(d.items?.length){h+=`<div class="section-heading">Schedule</div><div class="timeline">${d.items.map(i=>ri(i,d.city)).join('')}</div>`;}
   document.getElementById('day-content').innerHTML=h;
-  document.getElementById('content-panel').scrollTop=0;
-  buildMap(d);
+
+  // Scroll to top
+  const cp=document.getElementById('content-panel');
+  if(isMobile()){window.scrollTo({top:0,behavior:'smooth'});}
+  else{cp.scrollTop=0;}
+
+  buildMaps(d);
+
+  // Reset mobile map height after render
+  if(isMobile()){
+    const inner=document.getElementById('mobile-map-inner');
+    if(mapOpen){
+      requestAnimationFrame(()=>{
+        const mh=document.getElementById('mobile-map-container').offsetHeight;
+        const lh=document.getElementById('mobile-map-legend').offsetHeight;
+        inner.style.height=(mh+lh+10)+'px';
+        if(MMAP) MMAP.invalidateSize();
+      });
+    } else {
+      inner.style.height='0px';
+    }
+  }
 }
 
 function go(i){cur=i;buildSidebar();renderDay();}
-buildSidebar();renderDay();
+
+// ── INIT ───────────────────────────────────────────────────────────────
+// Set initial mobile map height to open
+document.getElementById('mobile-map-inner').style.height='auto';
+buildSidebar();
+renderDay();
+// After first render, set proper height
+requestAnimationFrame(()=>{
+  const inner=document.getElementById('mobile-map-inner');
+  const mh=document.getElementById('mobile-map-container').offsetHeight;
+  const lh=document.getElementById('mobile-map-legend').offsetHeight;
+  inner.style.height=(mh+lh+10)+'px';
+});
 </script>
 </body>
 </html>

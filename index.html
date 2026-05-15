@@ -24,7 +24,7 @@ body{font-family:'DM Sans',system-ui,sans-serif;background:var(--bg);color:var(-
 button{font-family:inherit;cursor:pointer;border:none;background:none}
 
 /* ── MOBILE NAV (hidden on desktop) ─────────────────────────────── */
-#mobile-nav{display:none;position:sticky;top:0;z-index:100;background:var(--white);border-bottom:1px solid var(--border)}
+#mobile-nav{display:none;position:sticky;top:0;z-index:1000;background:var(--white);border-bottom:1px solid var(--border)}
 #mobile-header{display:flex;align-items:center;padding:12px 16px 8px;gap:10px}
 #mobile-title{font-family:'Playfair Display',serif;font-size:16px;font-weight:400}
 #mobile-city-pill{font-size:11px;padding:2px 9px;border-radius:99px;font-weight:500;margin-left:auto}
@@ -83,9 +83,10 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
 #mobile-map-wrap{display:none;background:var(--white);border-bottom:1px solid var(--border)}
 #map-toggle-btn{width:100%;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;font-size:12px;font-weight:500;color:var(--text2);background:var(--white)}
 #map-toggle-btn span{font-size:11px;color:var(--text3);font-weight:400}
-#mobile-map-inner{overflow:hidden;transition:height .25s ease}
+#mobile-map-inner{overflow:hidden;transition:height .25s ease;isolation:isolate}
 #mobile-map-container{height:230px;width:100%}
 #mobile-map-legend{padding:8px 16px;font-size:11px;color:var(--text2);line-height:1.7;border-top:1px solid var(--border);background:var(--bg)}
+#mobile-map-wrap{display:none;background:var(--white);border-bottom:1px solid var(--border);margin-bottom:20px}
 
 /* ── LEAFLET ─────────────────────────────────────────────────────── */
 .leaflet-container{background:#eee9df}
@@ -234,25 +235,25 @@ const DAYS=[
 summary:"A long travel day from Sydney via Guangzhou. You'll clear Chinese immigration at Guangzhou Baiyun — your first port of entry — then take the connecting flight to Hangzhou, landing just after 11pm. Expect to reach family around midnight.",
 stats:[{l:"Arrive",v:"23:10 HGH"},{l:"Stay",v:"Family home"},{l:"Pace",v:"Travel day"}],
 mapType:"flight",
-locs:[{n:"Guangzhou Baiyun Airport",lat:23.393,lng:113.299,num:1},{n:"Hangzhou Xiaoshan Airport",lat:30.230,lng:120.431,num:2},{n:"Hangzhou city centre",lat:30.274,lng:120.155,num:3}],
+locs:[{n:"Guangzhou Baiyun Airport",lat:23.393,lng:113.299,num:1},{n:"Hangzhou Xiaoshan Airport",lat:30.230,lng:120.431,num:2},{n:"Jinshahu – family home",lat:30.283,lng:120.235,num:3}],
 flights:[
 {label:"CZ8092 · International",type:"intl",from:"SYD",fromCity:"Sydney Kingsford Smith",dep:"Departs Sydney",depT:"Terminal 1",to:"CAN",toCity:"Guangzhou Baiyun",arr:"Arrives Guangzhou",arrT:"Terminal 2",dur:"~9 hrs · Boeing 787-9",note:"Clear immigration & customs here · Confirm bags are through-checked to HGH"},
-{label:"Connecting flight · Domestic",type:"dom",from:"CAN",fromCity:"Guangzhou Baiyun",dep:"21:00",depT:"Terminal 2",to:"HGH",toCity:"Hangzhou Xiaoshan",arr:"23:10",arrT:"Terminal 4",dur:"~2 hrs 10 min",note:"No immigration on arrival · Didi or family pickup ~35 min to city"}],
+{label:"Connecting flight · Domestic",type:"dom",from:"CAN",fromCity:"Guangzhou Baiyun",dep:"21:00",depT:"Terminal 2",to:"HGH",toCity:"Hangzhou Xiaoshan",arr:"23:10",arrT:"Terminal 4",dur:"~2 hrs 10 min",note:"No immigration on arrival · Didi or family pickup ~30 min to Jinshahu"}],
 items:[
 {time:"At Guangzhou",type:"alert",title:"Immigration & customs",desc:"First port of entry into China. Have passport, arrival card and accommodation address ready. Allow 60–90 min for the international → domestic transfer.",tags:[{c:"warn",t:"Immigration here"},{c:"transport",t:"60–90 min transfer"}]},
-{time:"23:10",type:"transport",num:2,title:"Land Hangzhou Xiaoshan (T4)",desc:"Baggage claim, then out to arrivals. Family pickup or Didi — 35–50 min to city centre.",tags:[{c:"transport",t:"HGH Terminal 4"}]},
-{time:"~00:30",type:"food",num:3,title:"Arrive home · late supper",desc:"Family will have food waiting. Eat, decompress, get to bed.",tags:[{c:"food",t:"Late supper at home"}]}]},
+{time:"23:10",type:"transport",num:2,title:"Land Hangzhou Xiaoshan (T4)",desc:"Baggage claim, then out to arrivals. Family pickup or Didi to Jinshahu — Xiaoshan Airport is about 25–30 min east of home, so a straightforward run.",tags:[{c:"transport",t:"HGH Terminal 4"},{c:"transport",t:"~25–30 min to Jinshahu"}]},
+{time:"~00:00",type:"food",num:3,title:"Arrive home — Jinshahu · late supper",desc:"Family will have food waiting. Eat, decompress, get to bed. Jinshahu's location in eastern Hangzhou means a shorter airport run than most of the city — small win after a long day.",tags:[{c:"food",t:"Late supper at home"}]}]},
 
 {id:2,date:"Sat 17 May",dateShort:"17\nSat",city:"hzh",cityLabel:"Hangzhou",phase:"Family",title:"Suits, friends & West Lake",sub:"Shopping · Longjing · Mal & Rifah",
 summary:"A social first full day. Suit shopping with aunt and grandma in the morning, Longjing tea village after lunch, then catching up with Mal and Rifah at West Lake in the afternoon. Lingyin Temple moves to Day 8.",
 stats:[{l:"Pace",v:"Busy but fun"},{l:"Cost",v:"~¥200+"},{l:"Note",v:"Lingyin on 23 May"}],
 mapType:"city",
-locs:[{n:"Wulin Square – suit shopping",lat:30.268,lng:120.153,num:1},{n:"Zhiweiguan – lunch",lat:30.249,lng:120.151,num:2},{n:"Longjing Tea Village",lat:30.217,lng:120.100,num:3},{n:"Bai Causeway – Mal & Rifah",lat:30.250,lng:120.144,num:4},{n:"Family dinner (West Lake)",lat:30.255,lng:120.158,num:5}],
+locs:[{n:"Jinshahu – home",lat:30.283,lng:120.235,num:0},{n:"Wulin Square – suit shopping",lat:30.268,lng:120.153,num:1},{n:"Zhiweiguan – lunch",lat:30.249,lng:120.151,num:2},{n:"Longjing Tea Village",lat:30.217,lng:120.100,num:3},{n:"Bai Causeway – Mal & Rifah",lat:30.250,lng:120.144,num:4},{n:"Family dinner (West Lake)",lat:30.255,lng:120.158,num:5}],
 items:[
-{time:"8:00 am",type:"food",title:"Breakfast with family",desc:"Ease into the morning at home before a busy day out.",tags:[]},
-{time:"10:00 am",type:"rest",num:1,title:"Suit shopping — with aunt & grandma",desc:"Hangzhou has excellent tailors. Qingchun Road and Wulin Square area if you need a starting point. Flag follow-up fittings before you leave for Shanghai tomorrow.",tags:[{c:"",t:"Allow 2–3 hrs"},{c:"warn",t:"Arrange follow-up before 18th"}]},
+{time:"8:00 am",type:"food",title:"Breakfast at home — Jinshahu",desc:"Ease into the morning before a busy day out. From Jinshahu, Wulin Square is about 20–25 min by taxi or Didi going west.",tags:[]},
+{time:"10:00 am",type:"rest",num:1,title:"Suit shopping — with aunt & grandma",desc:"Hangzhou has excellent tailors. Qingchun Road and Wulin Square area if you need a starting point. Flag follow-up fittings before you leave for Shanghai tomorrow — good to know: Hangzhou East Station is only ~3km from Jinshahu, so getting to your train is easy.",tags:[{c:"",t:"Allow 2–3 hrs"},{c:"warn",t:"Arrange follow-up before 18th"},{c:"transport",t:"Hangzhou East is ~3km from home"}]},
 {time:"1:00 pm",type:"food",num:2,title:"Lunch — Zhiweiguan",desc:"Century-old Hangzhou restaurant. Beggar's chicken, dongpo pork, osmanthus cake. Worth booking ahead on Saturdays.",tags:[{c:"food",t:"Beggar's chicken"},{c:"food",t:"Dongpo pork"}]},
-{time:"2:30 pm",type:"rest",num:3,title:"Longjing tea village",desc:"Dragon Well tea at its best in May — spring harvest still on. Buy direct from a grower, watch the pan-frying, have a cup. Keep to 90 min to be back for 4pm.",tags:[{c:"food",t:"Buy 50g to take home"},{c:"transport",t:"~30 min from city"}]},
+{time:"2:30 pm",type:"rest",num:3,title:"Longjing tea village",desc:"Dragon Well tea at its best in May — spring harvest still on. Buy direct from a grower, watch the pan-frying, have a cup. From the West Lake area it's ~20 min; allow ~45 min total from Jinshahu.",tags:[{c:"food",t:"Buy 50g to take home"},{c:"transport",t:"~45 min from Jinshahu"}]},
 {time:"4:00 pm",type:"night",num:4,title:"Meet Mal & Rifah",desc:"Two hours at West Lake waterfront. Walk the Bai Causeway, grab drinks at one of the lakeside cafés.",tags:[{c:"night",t:"West Lake cafés nearby"},{c:"",t:"Until 6pm"}]},
 {time:"6:30 pm",type:"food",num:5,title:"Family dinner",desc:"Last meal before your solo leg. West Lake vinegar fish is the one to order.",tags:[{c:"food",t:"West Lake vinegar fish"}]}]},
 
@@ -262,7 +263,7 @@ stats:[{l:"Train",v:"Hangzhou E → Shanghai"},{l:"Cost",v:"¥73–80"},{l:"Solo
 mapType:"intercity",
 locs:[{n:"Hangzhou East Station",lat:30.293,lng:120.217,num:1},{n:"Shanghai Hongqiao Station",lat:31.195,lng:121.327,num:2},{n:"The Bund",lat:31.240,lng:121.490,num:3},{n:"Yu Garden",lat:31.227,lng:121.492,num:4},{n:"Bar Rouge – Bund 18",lat:31.239,lng:121.491,num:5}],
 items:[
-{time:"8:30 am",type:"transport",num:1,title:"G-train from Hangzhou East",desc:"Trains every 20–30 min. Book on 12306 the night before. ~58 min, smooth and fast.",tags:[{c:"transport",t:"G-train ~58 min"},{c:"transport",t:"¥73–80 2nd class"}]},
+{time:"8:30 am",type:"transport",num:1,title:"G-train from Hangzhou East",desc:"Hangzhou East is only ~3km from Jinshahu — a 10 min Didi at most. Trains every 20–30 min, ~58 min to Shanghai. Book on 12306 the night before.",tags:[{c:"transport",t:"G-train ~58 min"},{c:"transport",t:"¥73–80 2nd class"},{c:"transport",t:"Hangzhou East ~10 min from home"}]},
 {time:"10:00 am",type:"transport",num:2,title:"Arrive Shanghai Hongqiao",desc:"Metro Line 2 or taxi into the city. Check in — aim for Jing'an, Huangpu or Xuhui.",tags:[{c:"",t:"¥400–800/night"}]},
 {time:"11:30 am",type:"history",num:3,title:"The Bund",desc:"Walk the full 1.5 km waterfront. Colonial buildings one side, Pudong skyline across the river.",tags:[]},
 {time:"1:00 pm",type:"food",title:"Lunch — Lost Heaven (Bund)",desc:"Yunnan-style food in a colonial building. Sit at the bar if solo.",tags:[{c:"food",t:"Yunnan cuisine"},{c:"",t:"Book ahead"}]},
@@ -315,13 +316,14 @@ items:[
 summary:"A gentler morning on Nanjing's extraordinary Ming-dynasty city wall before the train back to Hangzhou and your family. Solo leg complete.",
 stats:[{l:"Train",v:"Nanjing → Hangzhou ~2 hr"},{l:"Cost",v:"~¥134"},{l:"Arrive",v:"Afternoon"}],
 mapType:"intercity",
-locs:[{n:"Xuanwu Gate – City Wall",lat:32.075,lng:118.790,num:1},{n:"Xuanwu Lake Park",lat:32.076,lng:118.794,num:2},{n:"Nanjing South Station",lat:31.976,lng:118.796,num:3},{n:"Hangzhou East Station",lat:30.293,lng:120.217,num:4}],
+locs:[{n:"Xuanwu Gate – City Wall",lat:32.075,lng:118.790,num:1},{n:"Xuanwu Lake Park",lat:32.076,lng:118.794,num:2},{n:"Nanjing South Station",lat:31.976,lng:118.796,num:3},{n:"Hangzhou East Station",lat:30.293,lng:120.217,num:4},{n:"Jinshahu – family home",lat:30.283,lng:120.235,num:5}],
 items:[
 {time:"8:30 am",type:"history",num:1,title:"Ancient City Wall — Xuanwu section",desc:"The longest city wall in the world at 35 km. Views over Xuanwu Lake and the old gates.",tags:[{c:"",t:"¥35 entry"},{c:"",t:"~1.5 hrs"}]},
 {time:"10:00 am",type:"rest",num:2,title:"Xuanwu Lake Park",desc:"City lake enclosed by the old walls. Free entry.",tags:[]},
 {time:"12:00 pm",type:"food",title:"Last Nanjing lunch — duck blood soup",desc:"One more bowl before you leave.",tags:[{c:"food",t:"Final duck soup"}]},
 {time:"1:30 pm",type:"transport",num:3,title:"G-train back to Hangzhou",desc:"Nanjing South → Hangzhou East. ~2 hrs.",tags:[{c:"transport",t:"~¥134 2nd class"}]},
-{time:"4:00 pm",type:"rest",num:4,title:"Reunite with family",desc:"Solo leg complete. Three cities, seven days.",tags:[]},
+{time:"~3:30 pm",type:"rest",num:4,title:"Arrive Hangzhou East",desc:"Hangzhou East is practically next door to Jinshahu — ~10 min home by Didi.",tags:[{c:"transport",t:"~10 min to Jinshahu"}]},
+{time:"4:00 pm",type:"rest",num:5,title:"Home — Jinshahu · solo leg complete",desc:"Three cities, seven days. Unpack, share stories.",tags:[]},
 {time:"7:30 pm",type:"food",title:"Family dinner",desc:"Bring back Nanjing salt-baked duck and Jinling cloud cakes (云片糕) as gifts.",tags:[{c:"food",t:"Bring duck as souvenir"}]}]},
 
 {id:8,date:"Fri 23 May",dateShort:"23\nFri",city:"hzh",cityLabel:"Hangzhou",phase:"Family",title:"Lingyin, tea & wetlands",sub:"Temples · Tea Museum · Xixi",
@@ -342,7 +344,7 @@ stats:[{l:"Train",v:"Hangzhou → Wenzhou ~2 hrs"},{l:"Cost",v:"~¥150 each way"
 mapType:"intercity",
 locs:[{n:"Hangzhou East Station",lat:30.293,lng:120.217,num:1},{n:"Wenzhou South Station",lat:27.957,lng:120.654,num:2},{n:"Wenzhou city centre – hotel",lat:28.000,lng:120.672,num:3}],
 items:[
-{time:"Morning",type:"transport",num:1,title:"G-train to Wenzhou",desc:"Hangzhou East → Wenzhou South. ~2 hrs (~¥150 2nd class). Book on 12306 ahead of time.",tags:[{c:"transport",t:"~2 hrs · ¥150 2nd class"},{c:"transport",t:"Book ahead on 12306"}]},
+{time:"Morning",type:"transport",num:1,title:"G-train to Wenzhou",desc:"Hangzhou East → Wenzhou South. ~2 hrs (~¥150 2nd class). Hangzhou East is ~10 min from Jinshahu by Didi — easy early start. Book on 12306 ahead of time.",tags:[{c:"transport",t:"~2 hrs · ¥150 2nd class"},{c:"transport",t:"Hangzhou East ~10 min from home"}]},
 {time:"Arrival",type:"rest",num:2,title:"Check into hotel — Wenzhou",desc:"Drop bags, freshen up. Book somewhere central or near the wedding venue. Don't leave this too late — good hotels fill up on weekends.",tags:[{c:"warn",t:"Book hotel in advance"}]},
 {time:"Wedding",type:"night",num:3,title:"Wedding ceremony & banquet",desc:"Multi-course, long, and celebratory — expect a lively evening with lots of toasting. Dress smart.",tags:[{c:"",t:"Dress smart"},{c:"food",t:"Multi-course banquet"}]},
 {time:"Night",type:"rest",title:"Overnight in Wenzhou",desc:"Stay at your hotel. Morning train back to Hangzhou tomorrow — back in time for a farewell lunch before your 18:35 flight.",tags:[{c:"",t:"Relaxed overnight"}]}]},
@@ -351,16 +353,16 @@ items:[
 summary:"Morning G-train back from Wenzhou to Hangzhou, arriving mid-morning. A final family lunch, then a relaxed afternoon before heading to the airport for your 18:35 departure to Guangzhou.",
 stats:[{l:"Train",v:"Wenzhou → Hangzhou AM"},{l:"Depart HGH",v:"18:35 · CZ3502"},{l:"Overnight",v:"Guangzhou"}],
 mapType:"flight",
-locs:[{n:"Wenzhou South Station",lat:27.957,lng:120.654,num:1},{n:"Hangzhou East Station",lat:30.293,lng:120.217,num:2},{n:"West Lake (Su Causeway)",lat:30.249,lng:120.140,num:3},{n:"Hangzhou Xiaoshan Airport",lat:30.230,lng:120.431,num:4},{n:"Guangzhou Baiyun Airport",lat:23.393,lng:113.299,num:5}],
+locs:[{n:"Wenzhou South Station",lat:27.957,lng:120.654,num:1},{n:"Hangzhou East Station",lat:30.293,lng:120.217,num:2},{n:"Jinshahu – family home",lat:30.283,lng:120.235,num:3},{n:"West Lake (Su Causeway)",lat:30.249,lng:120.140,num:4},{n:"Hangzhou Xiaoshan Airport",lat:30.230,lng:120.431,num:5}],
 flights:[{label:"CZ3502 · Domestic",type:"dom",from:"HGH",fromCity:"Hangzhou Xiaoshan",dep:"18:35",depT:"Terminal 4",to:"CAN",toCity:"Guangzhou Baiyun",arr:"~20:50",arrT:"Terminal 2",dur:"~2 hrs 15 min · A330-300",note:"On-time rating 4.6/5 · Leave for airport by 16:30"}],
 overnight:{title:"Overnight in Guangzhou · ~11 hrs",desc:"CZ3502 arrives ~20:50 and CZ301 departs 08:00 the next morning. Recommend the Novotel Guangzhou Baiyun Airport — connected to T2 by walkway. Book ahead. Be back at T2 check-in by 06:00 (closes 07:15)."},
 items:[
 {time:"Morning",type:"transport",num:1,title:"G-train Wenzhou → Hangzhou",desc:"Aim for a train departing 7–8am to be back in Hangzhou by 10am. Book the return ticket before the wedding.",tags:[{c:"transport",t:"~2 hrs · ~¥150"},{c:"warn",t:"Book return ticket in advance"}]},
-{time:"~10:00 am",type:"rest",num:2,title:"Arrive Hangzhou — back with family",desc:"Drop bags, freshen up. Good chunk of morning before needing to think about the airport.",tags:[]},
+{time:"~10:00 am",type:"rest",num:2,title:"Back at Jinshahu — freshen up",desc:"Hangzhou East is ~10 min from home — quick turnaround. Drop bags, change if needed.",tags:[{c:"transport",t:"Hangzhou East ~10 min from Jinshahu"}]},
 {time:"11:00 am",type:"rest",num:3,title:"Final West Lake walk",desc:"Su Causeway — longer and quieter than Bai Causeway, mist on the water in May mornings.",tags:[]},
 {time:"12:30 pm",type:"food",title:"Final family lunch",desc:"Let the family choose. Long, slow, lots of dishes, some toasting. This is the one.",tags:[]},
 {time:"2:30 pm",type:"rest",title:"Pack up · sort gifts",desc:"Longjing tea in sealed bags is fine through Australian customs.",tags:[{c:"",t:"Sealed tea: OK for customs"},{c:"transport",t:"Didi to airport ~40 min"}]},
-{time:"4:30 pm",type:"transport",num:4,title:"Leave for Hangzhou Xiaoshan Airport",desc:"Allow 40–50 min. Check in at Terminal 4.",tags:[{c:"transport",t:"HGH Terminal 4"}]},
+{time:"4:30 pm",type:"transport",num:5,title:"Leave for Hangzhou Xiaoshan Airport",desc:"Allow 40–50 min from Jinshahu. Check in at Terminal 4.",tags:[{c:"transport",t:"HGH Terminal 4"},{c:"transport",t:"~35–40 min from Jinshahu"}]},
 {time:"18:35",type:"transport",title:"CZ3502 departs Hangzhou",desc:"~2 hrs 15 min to Guangzhou Baiyun T2. Arrive ~20:50.",tags:[{c:"transport",t:"CAN T2 on arrival"}]},
 {time:"~21:30",type:"rest",num:5,title:"Check in — Novotel Guangzhou Airport",desc:"Connected to T2 by walkway. Sleep. Early start tomorrow.",tags:[{c:"",t:"Novotel linked to T2"},{c:"warn",t:"Set alarm 5:30 am"}]}]},
 
